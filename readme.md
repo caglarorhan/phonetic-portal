@@ -25,7 +25,7 @@ The **vocIPA** Chrome extension allows users to view the International Phonetic 
 ![Screenshot 2](path/to/screenshot2.png)
 
 ## Support
-If you encounter any issues or have any questions, please contact us at [support@example.com](mailto:support@example.com).
+If you encounter any issues or have any questions, please contact us at [caglaror@gmail.com](mailto:caglaror@gmail.com).
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
