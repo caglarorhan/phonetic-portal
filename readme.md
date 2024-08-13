@@ -1,4 +1,4 @@
-# vocIPA Chrome Extension
+# ![](./img/vocIPA_32.png) vocIPA Chrome Extension
 
 ## Overview
 The **vocIPA** Chrome extension allows users to view the International Phonetic Alphabet (IPA) pronunciation of selected text on any webpage. This tool is particularly useful for linguists, language learners, and anyone interested in phonetics.
