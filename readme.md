@@ -21,8 +21,9 @@ The **vocIPA** Chrome extension allows users to view the International Phonetic 
 5. A popup will appear showing the IPA pronunciation of the selected text.
 
 ## Screenshots
-![Screenshot 1](path/to/screenshot1.png)
-![Screenshot 2](path/to/screenshot2.png)
+![Screenshot 1](./img/ss-1.JPG)
+![Screenshot 2](./img/ss-2.JPG)
+![Screenshot 3](./img/ss-3.JPG)
 
 ## Support
 If you encounter any issues or have any questions, please contact us at [caglaror@gmail.com](mailto:caglaror@gmail.com).
