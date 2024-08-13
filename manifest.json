@@ -7,17 +7,17 @@
     "default_popup": "index.html",
     "default_title": "vocIPA",
     "default_icon": {
-      "16": "./img/wikinediyo_16.png",
-      "128": "./img/wikinediyo_128.png"
+      "16": "./img/vocIPA_16.png",
+      "128": "./img/vocIPA_128.png"
     }
   },
   "icons": {
-    "16": "./img/wikinediyo_16.png",
-    "32": "./img/wikinediyo_32.png",
-    "64": "./img/wikinediyo_64.png",
-    "128": "./img/wikinediyo_128.png",
-    "256": "./img/wikinediyo_256.png",
-    "512": "./img/wikinediyo_512.png"
+    "16": "./img/vocIPA_16.png",
+    "32": "./img/vocIPA_32.png",
+    "64": "./img/vocIPA_64.png",
+    "128": "./img/vocIPA_128.png",
+    "256": "./img/vocIPA_256.png",
+    "512": "./img/vocIPA_512.png"
   },
   "background": {
     "service_worker": "./js/eventPage.js"
