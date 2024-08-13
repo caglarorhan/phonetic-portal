@@ -48,7 +48,7 @@ function createAndPositionPopup(text) {
 	if (selection.rangeCount > 0) {
 		const range = selection.getRangeAt(0);
 		const rect = range.getBoundingClientRect();
-		popup.style.top = `${rect.top - 40 + window.scrollY}px`;
+		popup.style.top = `${rect.top - 120 + window.scrollY}px`;
 		popup.style.left = `${rect.left + window.scrollX}px`;
 	}
 }
