@@ -21,7 +21,7 @@ function createAndPositionPopup(text) {
 
 	// Create and style header
 	const header = document.createElement('div');
-	header.textContent = 'Pronunciation';
+	header.textContent = 'IPA Pronunciation';
 	header.style.fontWeight = 'bold';
 	header.style.marginBottom = '10px';
 	header.style.fontSize = '18px'; // Assuming header font size from index.css
@@ -33,7 +33,7 @@ function createAndPositionPopup(text) {
 
 	// Create and style footer
 	const footer = document.createElement('div');
-	footer.textContent = 'vocIPA';
+	footer.textContent = 'Phonetic Portal';
 	footer.style.textAlign = 'right';
 	footer.style.fontSize = '14px';
 	footer.style.color = '#888888'; // Assuming lighter text color for the footer from index.css
@@ -56,16 +56,16 @@ function createAndPositionPopup(text) {
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.action === 'createPopup') {
-		console.log("Mesaj geldi: " + request.text);
+		console.log("Message has been received: " + request.text);
 		if (request.text.length < 1) {
 			request.text = "No data found";
 		}
 		createAndPositionPopup(request.text);
-		sendResponse({ status: 'Popup created' });
+		sendResponse({ status: 'Portal has been opened' });
 	}
 });
 
-// Remove the popup when the user clicks somewhere else
+// Remove the pop-up when the user clicks somewhere else
 document.addEventListener('click', function() {
 	const selection = window.getSelection();
 	if (selection.isCollapsed) {

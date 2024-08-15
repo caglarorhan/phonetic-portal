@@ -1,11 +1,11 @@
 {
-  "name": "vocIPA",
-  "description" : "What is the phonetics of this word?",
+  "name": "Phonetic Portal",
+  "description" : "Opens a portal and displays the phonetic pronunciation of the highlighted word.",
   "version": "2024.0.1",
   "manifest_version": 3,
   "action": {
     "default_popup": "index.html",
-    "default_title": "vocIPA",
+    "default_title": "Phonetic Portal",
     "default_icon": {
       "16": "./img/vocIPA_16.png",
       "128": "./img/vocIPA_128.png"
