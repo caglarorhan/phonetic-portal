@@ -1,6 +1,6 @@
 var menuItem = {
-    "id":"vocipa",
-    "title":"vocIPA",
+    "id":"phonetic-portal",
+    "title":"Phonetic Portal",
     "contexts":["selection"]
 };
 chrome.contextMenus.removeAll(function() {
@@ -14,11 +14,16 @@ function fixedEncodeURI(str){
 }
 
 
-chrome.contextMenus.onClicked.addListener(function(clickData){
-    console.log("calisiyor");
-    if(clickData.menuItemId === "vocipa" && clickData.selectionText){
-        let vocIPAURL = "https://www.vocabulary.com/dictionary/autocomplete-ss?search="+fixedEncodeURI(clickData.selectionText);
-        let response = fetch(vocIPAURL, {});
+chrome.contextMenus.onClicked.addListener((clickData)=>{
+    checkIPA(clickData)
+});
+
+
+function checkIPA(clickData){
+    console.log("Works like a charm!");
+    if(clickData.menuItemId === "phonetic-portal" && clickData.selectionText){
+        let phoneticPortalURL = "https://www.vocabulary.com/dictionary/autocomplete-ss?search="+fixedEncodeURI(clickData.selectionText);
+        let response = fetch(phoneticPortalURL, {});
         response.then(function(response){
             return response.text();
         }).then(function(text){
@@ -28,9 +33,15 @@ chrome.contextMenus.onClicked.addListener(function(clickData){
                             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                                 chrome.tabs.sendMessage(tabs[0].id, { action: 'createPopup', text: theIPA });
                             });
-        });
-
-        
-       
+        }).catch(function(error){
+            console.log("Error: " + error);
+        }); 
     }
+}
+
+
+// Listen for messages from content.js
+chrome.runtime.onMessage.addListener((message) => {
+    checkIPA(message.text);
 });
+
