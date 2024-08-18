@@ -15,33 +15,39 @@ function fixedEncodeURI(str){
 
 
 chrome.contextMenus.onClicked.addListener((clickData)=>{
-    checkIPA(clickData)
+    if(clickData.menuItemId === "phonetic-portal" && clickData.selectionText){
+        checkIPA({searchText:clickData.selectionText});
+    }
 });
 
 
-function checkIPA(clickData){
-    console.log("Works like a charm!");
-    if(clickData.menuItemId === "phonetic-portal" && clickData.selectionText){
-        let phoneticPortalURL = "https://www.vocabulary.com/dictionary/autocomplete-ss?search="+fixedEncodeURI(clickData.selectionText);
+function checkIPA(searchData={searchText:""}){
+    if(searchData.searchText){
+        let phoneticPortalURL = "https://www.vocabulary.com/dictionary/autocomplete-ss?search="+fixedEncodeURI(searchData.searchText);
         let response = fetch(phoneticPortalURL, {});
         response.then(function(response){
             return response.text();
-        }).then(function(text){
-            let theIPA = text.split(`data-ipa="`)[1].split(`"`)[0];
+        }).then(function(ipaText){
+            let theIPA = ipaText.split(`data-ipa="`)[1].split(`"`)[0];
             console.log(theIPA)
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                chrome.tabs.sendMessage(tabs[0].id, { action: 'straightMessage', messageText:"Mesaj backgrounda ulaştı!"});
+            });
                             // Send a message to the content script to create and position the popup
                             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                                chrome.tabs.sendMessage(tabs[0].id, { action: 'createPopup', text: theIPA });
+                                chrome.tabs.sendMessage(tabs[0].id, { action: 'createPopup', searchText: searchData.searchText, ipaText: theIPA});
                             });
         }).catch(function(error){
             console.log("Error: " + error);
         }); 
+    }else{
+        chrome.tabs.sendMessage(tabs[0].id, { action: 'straightMessage', messageText:"Search data icinde searchtext yok!"});
     }
 }
 
 
 // Listen for messages from content.js
 chrome.runtime.onMessage.addListener((message) => {
-    checkIPA(message.text);
+    checkIPA({searchText:message.searchText});
 });
 

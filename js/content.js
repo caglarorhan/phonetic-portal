@@ -18,7 +18,7 @@ const phoneticPortal = {
 	updateLocalStorage(){
 		localStorage.setItem("previousSearches", JSON.stringify(this.previousSearches));
 	},
-	createAndPositionPopup(text) {
+	createAndPositionPopup(data={searchText: "Unknown", ipaText: "No data found!"}) {
 		document.getElementById(this.searchPopupId)?.remove();
 		const popup = document.createElement('div');
 		popup.id = this.searchPopupId;
@@ -33,7 +33,7 @@ const phoneticPortal = {
 		header.textContent = 'Selected Text';
 	
 		const content = document.createElement('div');
-		content.textContent = text;
+		content.textContent = data.ipaText;
 	
 		const footer = document.createElement('div');
 		footer.style.fontSize = '14px';
@@ -96,7 +96,7 @@ const phoneticPortal = {
 			}else{		
 				if(e.target.id === searchIconId){
 					console.log("Icon clicked");
-					sendMessageToBackground({action:'checkIPA', text:selection.toString()});
+					sendMessageToBackground({action:'checkIPA', searchText:selection.toString()});
 				}
 			}
 
@@ -114,7 +114,8 @@ const phoneticPortal = {
 			}
 		});
 	},
-	sendMessageToBackground(data={action: 'checkIPa', text: ''}) {
+	sendMessageToBackground(data={action: 'checkIPa', searchText: ''}) {
+		console.log(data);
 		chrome.runtime.sendMessage(data);
 	}
 
@@ -126,14 +127,18 @@ phoneticPortal.init();
 
 
 // Listen for messages from the background script
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	if (request.action === 'createPopup') {
-		console.log("Message has been received: " + request.text);
-		if (request.text.length < 1) {
-			request.text = "No data found";
-		}
-		phoneticPortal.createAndPositionPopup(request.text);
-		sendResponse({ status: 'Portal has been opened' });
+chrome.runtime.onMessage.addListener(function(request) {
+	switch(request.action){
+		case "createPopup":
+			console.log("Message has been received: " + request.searchText);
+			if (request.searchText.length < 1) {
+				request.searchText = "No data found!";
+			}
+			phoneticPortal.createAndPositionPopup({searchText: request.searchText, ipaText: request.ipaText});
+			break;
+			case "straightMessage":
+				console.log("Message has been received: " + request.messageText);
+				break;
 	}
 });
 
