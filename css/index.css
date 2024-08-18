@@ -50,3 +50,20 @@ a {
 a:hover {
 	text-decoration: underline;
 }
+
+.checkbox-container {
+	display: flex;
+	align-items: center;
+	margin-top: 10px; /* Add top margin */
+	margin-bottom: 10px;
+	padding-left:20px;
+	font-weight: bold;
+}
+.checkbox-container label {
+	margin-right: 10px;
+	margin-left:10px;
+}
+.checkbox-title {
+	font-weight: bold;
+	margin-bottom: 5px;
+}

@@ -23,13 +23,17 @@ chrome.contextMenus.onClicked.addListener((clickData)=>{
 
 function checkIPA(searchData={searchText:""}){
     if(searchData.searchText){
-        let phoneticPortalURL = "https://www.vocabulary.com/dictionary/autocomplete-ss?search="+fixedEncodeURI(searchData.searchText);
+        //let phoneticPortalURL = "https://www.vocabulary.com/dictionary/autocomplete-ss?search="+fixedEncodeURI(searchData.searchText); // SOLUTION_1
+        let phoneticPortalURL = "https://www.vocabulary.com/dictionary/"+fixedEncodeURI(searchData.searchText); // SOLUTION_2
         let response = fetch(phoneticPortalURL, {});
         response.then(function(response){
             return response.text();
         }).then(function(ipaText){
-            let theIPA = ipaText.split(`data-ipa="`)[1].split(`"`)[0];
-            console.log(theIPA)
+
+            //let theIPA = ipaText.split(`data-ipa="`)[1].split(`"`)[0]; // SOLUTION_1
+            let theIPA = parseAndBack(ipaText) // SOLUTION_2
+            console.log(theIPA) 
+
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                 chrome.tabs.sendMessage(tabs[0].id, { action: 'straightMessage', messageText:"Mesaj backgrounda ulaştı!"});
             });
@@ -43,6 +47,15 @@ function checkIPA(searchData={searchText:""}){
     }else{
         chrome.tabs.sendMessage(tabs[0].id, { action: 'straightMessage', messageText:"Search data icinde searchtext yok!"});
     }
+}
+
+function parseAndBack(fullText){
+    // <div class="ipa-section"> [1]
+    // <h3> [1] sonra </h3> ve [0] -> US degeri
+    // <h3> [2] sonra </h3> ve [0] -> UK degeri
+    let ipa_1 = fullText.split('<div class="ipa-section">')[1].split('<h3>')[1].split('</h3>')[0];
+    let ipa_2 = fullText.split('<div class="ipa-section">')[1].split('<h3>')[2].split('</h3>')[0];
+    return [ipa_1, ipa_2];
 }
 
 
