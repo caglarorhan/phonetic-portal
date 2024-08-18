@@ -3,7 +3,8 @@ body {
 	background-color: #f4f4f9;
 	margin: 0;
 	padding: 0;
-    width:400px;
+    width:500px;
+	height: 500px;
 }
 
 .header {
@@ -67,3 +68,4 @@ a:hover {
 	font-weight: bold;
 	margin-bottom: 5px;
 }
+
