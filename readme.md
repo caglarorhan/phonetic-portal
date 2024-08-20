@@ -29,7 +29,7 @@ The **Phonetic Portal** Chrome extension allows users to view the International 
 If you encounter any issues or have any questions, please open an issue.
 
 ## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the BSD 3-Clause License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgements
 - Thanks to all contributors and users for their support.
