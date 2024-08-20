@@ -4,35 +4,10 @@ const phoneticPortal = {
 	previousSearches: {}, // {"bottle": ["/ˈbɑdl/", "/ˈbɒtəl/"]}  // first value is US ipa second value is UK ipa
 	searchIconId: "phoneticSearchIcon",
 	searchPopupId: "phoneticSearchPopup",
-	// TODO: Tum localStorage yapisini  index.js ye tasimaliyiz.
 	init(){
-		this.syncToLocalStorage();
 		this.addCommonEvents();
 	},
-	syncToLocalStorage(){
-			if(localStorage.getItem("previousSearches") === null){
-				localStorage.setItem("previousSearches", JSON.stringify({}));
-			}else{
-				this.previousSearches = JSON.parse(localStorage.getItem("previousSearches"));
-			}
-	},
-	addToLocalStorage(data={searchText:"", ipaText:""}){
-		if(data.searchText.length < 1 || data.ipaText.length < 1) return;
-		this.previousSearches[data.searchText] = data.ipaText;
-		this.updateLocalStorage();
-	},
-	updateLocalStorage(){
-		localStorage.setItem("previousSearches", JSON.stringify(this.previousSearches));
-	},
-	lookUpInLocalStorage(searchText=""){
-		if(searchText.length < 1) return null;
-		if(this.previousSearches[searchText]){
-			return {searchText: searchText, ipaText: this.previousSearches[searchText]};
-		}else{
-			return null;
-		}
-	},
-	createAndPositionPopup(data={searchText: "Unknown", ipaText: "No data found!"}) {
+	createAndPositionPopup(data={searchText: "Unknown", ipaData:[]}) {
 		document.getElementById(this.searchPopupId)?.remove();
 		const popup = document.createElement('div');
 		popup.id = this.searchPopupId;
@@ -47,7 +22,7 @@ const phoneticPortal = {
 		header.textContent = 'Selected Text';
 	
 		const content = document.createElement('div');
-		content.textContent = data.ipaText;
+		content.textContent = data.ipaData.map((ipa) => `IPA (${ipa.country}): ${ipa.ipa_text}`).join('\n').join('\n');
 	
 		const footer = document.createElement('div');
 		footer.style.fontSize = '14px';
@@ -68,7 +43,6 @@ const phoneticPortal = {
 		}
 	
 		document.body.appendChild(popup);
-		this.addToLocalStorage(data);
 	},
 	createAndPositionIcon() {
 		const button = document.createElement('button');
@@ -143,6 +117,9 @@ phoneticPortal.init();
 
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener(function(request) {
+	console.log(`mesaj geldi: ${request.action}`);
+	console.log(`mesaj: ${JSON.stringify(request.messageText)}`);
+
 	switch(request.action){
 		case "createPopup":
 			console.log("Message has been received: " + request.searchText);
