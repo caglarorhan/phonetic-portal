@@ -1,5 +1,14 @@
 const phoneticPortal = {
     phoneticPortalURL:"https://www.vocabulary.com/dictionary/",
+    dataBaseName: "PhoneticPortalDB",
+    dataBaseVersion:1,
+    storeName: "searches",
+    sendMessageToContent(data){
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            chrome.tabs.sendMessage(tabs[0].id, data);
+        });
+
+    },
     init(){
         chrome.contextMenus.removeAll(()=>{
             console.log("All context menus removed.");
@@ -23,10 +32,12 @@ const phoneticPortal = {
         "title":"Phonetic Portal",
         "contexts":["selection"]
     },
-    checkIPA(searchData={searchText:""}){
+    checkIPA(searchData){
         let anyStoredData = this.getIPAFromIndexedDB(searchData.searchText);
+        this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(anyStoredData)});
         if(anyStoredData){
-            this.sendMessageToContent({ action: 'createPopup', searchText: searchData.searchText, ipaText: anyStoredData});
+            
+            this.sendMessageToContent({ action: 'createPopup', searchText: searchData.searchText, ipaData: anyStoredData});
             return;
         }
         if(searchData.searchText){
@@ -36,9 +47,10 @@ const phoneticPortal = {
                 return response.text();
             }).then((ipaText)=>{
                 let theIPA = this.utils.parseAndBack(ipaText);
-                this.sendMessageToContent({ action: 'straightMessage', messageText: theIPA});
+                this.sendMessageToContent({ action: 'straightMessage', messageText: this.db?`IndexedDB is ready!`:`IndexedDB is not ready!`});
+
                 theIPA.forEach((ipa)=>{
-                    //this.addDataToIndexedDB({searchText: searchData.searchText, ipaText: ipa.ipa_text, countryCode: ipa.country});
+                    this.addDataToIndexedDB({searchText: searchData.searchText, ipaText: ipa.ipa_text, countryCode: ipa.country});
                 })
                 this.sendMessageToContent({ action: 'createPopup', searchText: searchData.searchText, ipaData: theIPA});
             }).catch((error)=>{
@@ -48,62 +60,63 @@ const phoneticPortal = {
             this.sendMessageToContent({ action: 'straightMessage', messageText:"There is no text to search!"});
         }
     },
-    sendMessageToContent(data={action: 'checkIPA', searchText: ''}){
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            chrome.tabs.sendMessage(tabs[0].id, data);
-        });
-
-    },
     initIndexedDB() {
-        let request = indexedDB.open("PhoneticPortalDB", 1);
+        let request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
 
         request.onupgradeneeded = (event) => {
-            let db = event.target.result;
-            let objectStore = db.createObjectStore("searches", { keyPath: "id", autoIncrement: true });
+            this.db = event.target.result;
+            let objectStore = this.db.createObjectStore(this.storeName, { keyPath: "id", autoIncrement: true });
             objectStore.createIndex("searchText", "searchText", { unique: false });
-            objectStore.createIndex("ipaText", "ipaText", { unique: false });
-            objectStore.createIndex("countryCode", "countryCode", { unique: false });
         };
 
         request.onsuccess = (event) => {
             this.db = event.target.result;
-            //this.sendMessageToContent({ action: 'straightMessage', messageText: `IndexedDB initialized successfully!`});
+            this.sendMessageToContent({ action: 'straightMessage', messageText: `IndexedDB initialized successfully!`});
         };
 
-        request.onerror = (event) => {
-            //this.sendMessageToContent({ action: 'straightMessage', messageText: `Error initializing IndexedDB!`});
+        request.onerror = () => {
+            this.sendMessageToContent({ action: 'straightMessage', messageText: `Error initializing IndexedDB!`});
         };
     },
-    addDataToIndexedDB(data={searchText:"", ipaText:"", countryCode:""}) {
-        let transaction = this.db.transaction(["searches"], "readwrite");
-        let objectStore = transaction.objectStore("searches");
-        let request = objectStore.add({ searchText: searchText, ipaText: ipaText, countryCode: countryCode });
+    addDataToIndexedDB(data) {
+        let transaction = this.db.transaction([this.storeName], "readwrite");
+        let objectStore = transaction.objectStore(this.storeName);
+  
+        let request = objectStore.add({ searchText: data.searchText, ipaText: data.ipaText, countryCode: data.countryCode });
 
         request.onsuccess = () => {
-            //this.sendMessageToContent({ action: 'straightMessage', messageText: `Data added to IndexedDB successfully.`});
+            this.sendMessageToContent({ action: 'straightMessage', messageText: `Data added to IndexedDB successfully.`});
         };
 
         request.onerror = (event) => {
-           // this.sendMessageToContent({ action: 'straightMessage', messageText: `Error adding data to IndexedDB!`});
+           this.sendMessageToContent({ action: 'straightMessage', messageText: `Error adding data to IndexedDB!`});
         };
     },
     getIPAFromIndexedDB(searchText) {
-        let transaction = this.db.transaction(["searches"], "readonly");
-        let objectStore = transaction.objectStore("searches");
-        let index = objectStore.index("searchText");
-        let request = index.getAll(searchText);
-
+        const request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
         request.onsuccess = (event) => {
-            if (event.target.result.length > 0) {
-                return event.target.result;
-            } else {
-                return null;
-            }
-        };
+            const db = event.target.result;
+            const transaction = db.transaction([this.storeName], "readonly");
+            const store = transaction.objectStore(this.storeName);
+            const index = store.index("searchText");
+            let query = index.getAll(searchText);
+
+            query.onsuccess = (event) => {
+                const result = event.target.result;
+                if (result) {
+                    return event.target.result;
+                } else {
+                    return null;
+                }
+            };
+
+            query.onerror = (event) => {
+                this.sendMessageToContent({ action: 'straightMessage', messageText: `Error retrieving data from IndexedDB!`});
+            };
+        }
 
         request.onerror = (event) => {
-            this.sendMessageToContent({ action: 'straightMessage', messageText: `Error retrieving data from IndexedDB!`});
-            callback([]);
+            this.sendMessageToContent({ action: 'straightMessage', messageText: `Error opening IndexedDB!`});
         };
     },
     utils:{

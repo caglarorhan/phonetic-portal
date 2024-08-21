@@ -126,7 +126,7 @@ chrome.runtime.onMessage.addListener(function(request) {
 			if (request.searchText.length < 1) {
 				request.searchText = "No data found!";
 			}
-			phoneticPortal.createAndPositionPopup({searchText: request.searchText, ipaText: request.ipaText});
+			phoneticPortal.createAndPositionPopup({searchText: request.searchText, ipaText: request.ipaData});
 			break;
 			case "straightMessage":
 				console.log("Message has been received: " + request.messageText);
