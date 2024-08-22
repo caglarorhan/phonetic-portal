@@ -73,14 +73,21 @@ const phoneticPortal = {
 		const button = document.createElement('button');
 		button.id = this.searchIconId;
 		button.className = 'phonetic-search-icon';
-		button.style.position = 'absolute';
-		button.style.width = '24px';
-		button.style.height = '24px';
-		button.style.backgroundImage = `url('data:image/png;base64,${this.iconImageBase64Data}')`;
-		button.style.backgroundSize = 'cover';
-		button.style.border = 'none';
-		button.style.cursor = 'pointer';
-		button.style.zIndex = '1000';
+		button.style.cssText = `
+        position: absolute;
+        width: 32px;
+        height: 32px;
+        background-image: url('data:image/png;base64,${this.iconImageBase64Data}');
+        background-size: 24px 24px;
+        background-repeat: no-repeat;
+        background-position: center;
+        border: none;
+        cursor: pointer;
+        z-index: 1000;
+        background-color: white;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    `;
 		button.setAttribute('tabindex', '1');
 	
 		// Get the coordinates of the selected text
