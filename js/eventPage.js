@@ -5,18 +5,17 @@ const phoneticPortal = {
     storeName: "searches",
     sendMessageToContent(data){
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            chrome.tabs.sendMessage(tabs[0].id, data);
+            chrome.tabs.sendMessage(tabs[0].id, data, (response) => {
+                // do nothing
+            });
         });
 
     },
     init(){
         chrome.contextMenus.removeAll(()=>{
-            console.log("All context menus removed.");
             chrome.contextMenus.create(this.menuItem, () => {
                 if (chrome.runtime.lastError) {
-                    console.error("Error creating context menu:", chrome.runtime.lastError);
                 } else {
-                    console.log("Context menu item created successfully.");
                 }
             });
             });
@@ -32,33 +31,28 @@ const phoneticPortal = {
         "title":"Phonetic Portal",
         "contexts":["selection"]
     },
-    checkIPA(searchData){
-        let anyStoredData = this.getIPAFromIndexedDB(searchData.searchText);
-        this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(anyStoredData)});
-        if(anyStoredData){
-            
-            this.sendMessageToContent({ action: 'createPopup', searchText: searchData.searchText, ipaData: anyStoredData});
-            return;
-        }
-        if(searchData.searchText){
-            let phoneticPortalURL = this.phoneticPortalURL + this.utils.fixedEncodeURI(searchData.searchText);
-            let response = fetch(phoneticPortalURL, {});
-            response.then((response)=>{
-                return response.text();
-            }).then((ipaText)=>{
-                let theIPA = this.utils.parseAndBack(ipaText);
-                this.sendMessageToContent({ action: 'straightMessage', messageText: this.db?`IndexedDB is ready!`:`IndexedDB is not ready!`});
+    async checkIPA(searchData){
 
-                theIPA.forEach((ipa)=>{
-                    this.addDataToIndexedDB({searchText: searchData.searchText, ipaText: ipa.ipa_text, countryCode: ipa.country});
-                })
-                this.sendMessageToContent({ action: 'createPopup', searchText: searchData.searchText, ipaData: theIPA});
-            }).catch((error)=>{
-                this.sendMessageToContent({ action: 'straightMessage', messageText: `Background script error!`});
-            }); 
-        }else{
-            this.sendMessageToContent({ action: 'straightMessage', messageText:"There is no text to search!"});
-        }
+                if(searchData.searchText){
+                    let phoneticPortalURL = this.phoneticPortalURL + this.utils.fixedEncodeURI(searchData.searchText);
+                    let response = fetch(phoneticPortalURL, {});
+                    response.then((response)=>{
+                        return response.text();
+                    }).then((ipaText)=>{
+                        let theIPA = this.utils.parseAndBack(ipaText);
+                        this.sendMessageToContent({ action: 'straightMessage', messageText: this.db?`IndexedDB is ready!`:`IndexedDB is not ready!`});
+        
+                        theIPA.forEach((ipa)=>{
+                            this.addDataToIndexedDB({searchText: searchData.searchText, ipaText: ipa.ipa_text, countryCode: ipa.country});
+                            this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(theIPA)});
+                        })
+                        this.sendMessageToContent({ action: 'createPopup', searchText: searchData.searchText, ipaData: JSON.stringify(theIPA)});
+                    }).catch((error)=>{
+                        this.sendMessageToContent({ action: 'straightMessage', messageText: `Background script error!`});
+                    }); 
+                }else{
+                    this.sendMessageToContent({ action: 'straightMessage', messageText:"There is no text to search!"});
+                }
     },
     initIndexedDB() {
         let request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
@@ -92,32 +86,32 @@ const phoneticPortal = {
            this.sendMessageToContent({ action: 'straightMessage', messageText: `Error adding data to IndexedDB!`});
         };
     },
-    getIPAFromIndexedDB(searchText) {
-        const request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
-        request.onsuccess = (event) => {
-            const db = event.target.result;
-            const transaction = db.transaction([this.storeName], "readonly");
-            const store = transaction.objectStore(this.storeName);
-            const index = store.index("searchText");
-            let query = index.getAll(searchText);
+    async getIPAFromIndexedDB(searchText) {
+        return new Promise((resolve, reject) => {
+            let request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
+            request.onsuccess = (event) => {
+                const db = event.target.result;
+                const transaction = db.transaction([this.storeName], "readonly");
+                const store = transaction.objectStore(this.storeName);
+                const index = store.index("searchText");
+                let query = index.getAll(searchText);
 
-            query.onsuccess = (event) => {
-                const result = event.target.result;
-                if (result) {
-                    return event.target.result;
-                } else {
-                    return null;
-                }
+                query.onsuccess = (event) => {
+                    const result = event.target.result;
+                    resolve(result)
+                };
+
+                query.onerror = () => {
+                    this.sendMessageToContent({ action: 'straightMessage', messageText: `Error retrieving data from IndexedDB!`});
+                    reject();
+                };
+            }
+
+            request.onerror = () => {
+                this.sendMessageToContent({ action: 'straightMessage', messageText: `Error opening IndexedDB!`});
+                reject();
             };
-
-            query.onerror = (event) => {
-                this.sendMessageToContent({ action: 'straightMessage', messageText: `Error retrieving data from IndexedDB!`});
-            };
-        }
-
-        request.onerror = (event) => {
-            this.sendMessageToContent({ action: 'straightMessage', messageText: `Error opening IndexedDB!`});
-        };
+        });
     },
     utils:{
         fixedEncodeURI(str){

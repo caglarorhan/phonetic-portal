@@ -11,22 +11,36 @@ const phoneticPortal = {
 		document.getElementById(this.searchPopupId)?.remove();
 		const popup = document.createElement('div');
 		popup.id = this.searchPopupId;
-		popup.style.position = 'absolute';
-		popup.style.backgroundColor = '#ffffff';
-		popup.style.border = '1px solid #cccccc';
-		popup.style.padding = '10px';
-		popup.style.zIndex = '1000';
+		popup.style.cssText = `
+        position: absolute;
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 0 15px;
+        z-index: 1000;
+        max-width: 300px;
+        font-family: Arial, sans-serif;
+    `;;
 	
 		const header = document.createElement('div');
-		header.style.fontWeight = 'bold';
-		header.textContent = 'Selected Text';
+		header.style.cssText = `
+        font-weight: bold;
+        font-size: 18px;
+        margin-bottom: 10px;
+    `;
+		header.innerHTML = `<h3 style="color:red; margin-top:4px;">${data.searchText}</h3>`;
 	
 		const content = document.createElement('div');
-		content.textContent = data.ipaData.map((ipa) => `IPA (${ipa.country}): ${ipa.ipa_text}`).join('\n').join('\n');
+		console.log(`Gelen veri: ${data.ipaData}`);
+		content.innerHTML+= JSON.parse(data.ipaData).map((ipa) => `<strong>IPA (${ipa.country}):</strong> ${ipa.ipa_text}`).join('<br>');
 	
 		const footer = document.createElement('div');
-		footer.style.fontSize = '14px';
-		footer.style.color = '#888888'; // Assuming lighter text color for the footer from index.css
+		footer.style.cssText = `
+        font-size: 12px;
+        color: #888888;
+        margin-top: 10px;
+    `;
 	
 		// Append header, content, and footer to the popup
 		popup.appendChild(header);
@@ -84,8 +98,8 @@ const phoneticPortal = {
 				icon?.remove();
 			}else{		
 				if(e.target.id === searchIconId){
-					console.log("Icon clicked");
-					sendMessageToBackground({action:'checkIPA', searchText:selection.toString()});
+					let selectedTextOnly = selection.toString().trimEnd();
+					sendMessageToBackground({action:'checkIPA', searchText:selectedTextOnly});
 				}
 			}
 
@@ -104,8 +118,10 @@ const phoneticPortal = {
 		});
 	},
 	sendMessageToBackground(data={action: 'checkIPa', searchText: ''}) {
-		console.log(data);
-		chrome.runtime.sendMessage(data);
+		chrome.runtime.sendMessage(data, response=>{
+			console.log(response);
+			return true;
+		});
 	}
 
 
@@ -117,19 +133,15 @@ phoneticPortal.init();
 
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener(function(request) {
-	console.log(`mesaj geldi: ${request.action}`);
-	console.log(`mesaj: ${JSON.stringify(request.messageText)}`);
-
 	switch(request.action){
 		case "createPopup":
-			console.log("Message has been received: " + request.searchText);
 			if (request.searchText.length < 1) {
 				request.searchText = "No data found!";
 			}
-			phoneticPortal.createAndPositionPopup({searchText: request.searchText, ipaText: request.ipaData});
+			phoneticPortal.createAndPositionPopup({searchText: request.searchText, ipaData: request.ipaData});
 			break;
 			case "straightMessage":
-				console.log("Message has been received: " + request.messageText);
+				console.log("Message: " + request.messageText);
 				break;
 	}
 });
