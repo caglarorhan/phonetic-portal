@@ -63,8 +63,16 @@ const phoneticPortal = {
 		document.body.appendChild(popup);
 	},
 	createAndPositionIcon() {
+		let allIcons = [...document.querySelectorAll(".phonetic-search-icon")];
+		if(allIcons.length > 1){
+			allIcons.forEach((icon, index)=>{
+				if(index > 0){
+					icon.remove();
+				}});
+		}
 		const button = document.createElement('button');
 		button.id = this.searchIconId;
+		button.className = 'phonetic-search-icon';
 		button.style.position = 'absolute';
 		button.style.width = '24px';
 		button.style.height = '24px';
