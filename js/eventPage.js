@@ -33,6 +33,29 @@ const phoneticPortal = {
     },
     async checkIPA(searchData){
                 if(searchData.searchText){
+                    // if data is already in indexedDB, get it from there
+                    let result = await this.getIPAFromIndexedDB(searchData.searchText);
+                    if(result.length>0){
+                        const transformedResult = result.map(item => ({
+                            country: item.countryCode,
+                            ipa_text: item.ipaText
+                        }));
+                        const filteredResult = transformedResult.filter((item,index,self)=>{
+                            if(index===screenLeft.findIndex(t=>{
+                                return t.ipa_text===item.ipa_text && t.country===item.country
+                            }))
+                            return true;
+                        }
+                        )
+                        
+
+
+                        //this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(transformedResult)});
+                        this.sendMessageToContent({ action: 'createPopup', searchText: searchData.searchText, ipaData: JSON.stringify(transformedResult)});
+                        return;
+                    }else{
+                        this.sendMessageToContent({ action: 'straightMessage', messageText: `No data in IndexedDB!`});
+                    // Else, fetch from the phonetic portal and add to indexedDB
                     let phoneticPortalURL = this.phoneticPortalURL + this.utils.fixedEncodeURI(searchData.searchText);
                     let response = fetch(phoneticPortalURL, {});
                     response.then((response)=>{
@@ -49,6 +72,8 @@ const phoneticPortal = {
                     }).catch((error)=>{
                         this.sendMessageToContent({ action: 'straightMessage', messageText: `Background script error!`});
                     }); 
+                    }
+
                 }else{
                     this.sendMessageToContent({ action: 'straightMessage', messageText:"There is no text to search!"});
                 }

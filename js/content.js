@@ -85,7 +85,7 @@ const phoneticPortal = {
         cursor: pointer;
         z-index: 1000;
         background-color: white;
-        border-radius: 50%;
+        border-radius: 10%;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     `;
 		button.setAttribute('tabindex', '1');
