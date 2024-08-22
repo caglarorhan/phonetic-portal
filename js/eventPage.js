@@ -32,7 +32,6 @@ const phoneticPortal = {
         "contexts":["selection"]
     },
     async checkIPA(searchData){
-
                 if(searchData.searchText){
                     let phoneticPortalURL = this.phoneticPortalURL + this.utils.fixedEncodeURI(searchData.searchText);
                     let response = fetch(phoneticPortalURL, {});
@@ -89,6 +88,14 @@ const phoneticPortal = {
     async getIPAFromIndexedDB(searchText) {
         return new Promise((resolve, reject) => {
             let request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
+
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains(this.storeName)) {
+                    db.createObjectStore(this.storeName, { keyPath: 'searchText' });
+                }
+            };
+
             request.onsuccess = (event) => {
                 const db = event.target.result;
                 const transaction = db.transaction([this.storeName], "readonly");
@@ -118,12 +125,12 @@ const phoneticPortal = {
             return encodeURI(str).replace(/%5B/g, '[').replace(/%5D/g, ']')
         },
         parseAndBack(fullText){
+            const ipaValues = [];
             let ipa_1 = fullText.split('<div class="ipa-section">')[1].split('<h3>')[1].split('</h3>')[0];
+            ipaValues.push({country:'us', ipa_text:ipa_1});
             let ipa_2 = fullText.split('<div class="ipa-section">')[1].split('<h3>')[2].split('</h3>')[0];
-            return [
-                {country:'us', ipa_text:ipa_1},
-                {country:'uk', ipa_text:ipa_2}
-            ];
+            (ipa_2.startsWith("/") && ipa_2.endsWith("/"))?ipaValues.push({country:'uk', ipa_text:ipa_2}):"";
+            return ipaValues;
         }
     }
 }
