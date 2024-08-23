@@ -18,6 +18,7 @@ The **Phonetic Portal** Chrome extension allows users to view the International 
 2. Highlight the word you want to see the IPA pronunciation for.
 3. Right-click to open the context menu.
 4. Select "Phonetic Portal" from the context menu.
+5. Or click the appeared Phonetic Portal menu
 5. A portal will appear displaying the IPA pronunciation of the highlighted word.
 
 ## Screenshots
