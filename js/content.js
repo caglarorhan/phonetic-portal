@@ -105,6 +105,9 @@ const phoneticPortal = {
 		}
 		document.body.appendChild(button);
 	},
+	removeAllPreviousIcons(){
+		[...document.querySelectorAll(".phonetic-search-icon")].forEach(icon=>icon.remove());
+	},
 	addCommonEvents() {
 		const popupId = this.searchPopupId;
 		const searchIconId = this.searchIconId;
@@ -131,15 +134,22 @@ const phoneticPortal = {
 		});
 	
 		// Show the icon when the selection ends
-		document.addEventListener('mouseup', function() {
+		document.addEventListener('mouseup', ()=>{
 			const selection = window.getSelection();
 			if (!selection.isCollapsed) {
 					createAndPositionIcon();
 			}else{
-				let icon = document.getElementById(searchIconId);
-				icon?.remove();
+				this.removeAllPreviousIcons();
 			}
 		});
+		document.addEventListener('selectionchange', (e)=>{
+			let popup = document.getElementById(popupId);
+			this.removeAllPreviousIcons();
+			if(popup){
+				popup.remove();
+			}
+			
+		})
 	},
 	sendMessageToBackground(data={action: 'checkIPa', searchText: ''}) {
 		chrome.runtime.sendMessage(data, response=>{
