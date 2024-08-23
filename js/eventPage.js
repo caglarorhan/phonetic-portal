@@ -41,7 +41,7 @@ const phoneticPortal = {
                             ipa_text: item.ipaText
                         }));
                         const filteredResult = transformedResult.filter((item,index,self)=>{
-                            if(index===screenLeft.findIndex(t=>{
+                            if(index===self.findIndex(t=>{
                                 return t.ipa_text===item.ipa_text && t.country===item.country
                             }))
                             return true;
@@ -62,12 +62,14 @@ const phoneticPortal = {
                         return response.text();
                     }).then((ipaText)=>{
                         let theIPA = this.utils.parseAndBack(ipaText);
-                        this.sendMessageToContent({ action: 'straightMessage', messageText: this.db?`IndexedDB is ready!`:`IndexedDB is not ready!`});
-        
-                        theIPA.forEach((ipa)=>{
-                            this.addDataToIndexedDB({searchText: searchData.searchText, ipaText: ipa.ipa_text, countryCode: ipa.country});
-                            this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(theIPA)});
-                        })
+                        if(theIPA.length!==0){
+                            this.sendMessageToContent({ action: 'straightMessage', messageText: this.db?`IndexedDB is ready!`:`IndexedDB is not ready!`});
+                            theIPA.forEach((ipa)=>{
+                                this.addDataToIndexedDB({searchText: searchData.searchText, ipaText: ipa.ipa_text, countryCode: ipa.country});
+                                this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(theIPA)});
+                            })
+                        }
+
                         this.sendMessageToContent({ action: 'createPopup', searchText: searchData.searchText, ipaData: JSON.stringify(theIPA)});
                     }).catch((error)=>{
                         this.sendMessageToContent({ action: 'straightMessage', messageText: `Background script error!`});
@@ -151,6 +153,7 @@ const phoneticPortal = {
         },
         parseAndBack(fullText){
             const ipaValues = [];
+            if(!fullText.includes('<div class="ipa-section">')) return ipaValues;
             let ipa_1 = fullText.split('<div class="ipa-section">')[1].split('<h3>')[1].split('</h3>')[0];
             ipaValues.push({country:'us', ipa_text:ipa_1});
             let ipa_2 = fullText.split('<div class="ipa-section">')[1].split('<h3>')[2].split('</h3>')[0];
