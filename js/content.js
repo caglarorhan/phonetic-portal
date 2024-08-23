@@ -26,6 +26,7 @@ const phoneticPortal = {
         z-index: 1000;
         max-width: 300px;
         font-family: Arial, sans-serif;
+		color: black;
     `;;
 	
 		const header = document.createElement('div');
