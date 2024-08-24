@@ -117,7 +117,7 @@ const phoneticPortal = {
 
 
 		// Remove the pop-up when the user clicks somewhere else
-		document.addEventListener('click', function(e) {
+		document.addEventListener('click', (e)=>{
 			let popup = document.getElementById(popupId);
 			let icon = document.getElementById(searchIconId);
 			const selection = window.getSelection();
@@ -127,7 +127,12 @@ const phoneticPortal = {
 			}else{		
 				if(e.target.id === searchIconId){
 					let selectedTextOnly = selection.toString().trimEnd();
-					sendMessageToBackground({action:'checkIPA', searchText:selectedTextOnly});
+					if(selectedTextOnly.split(" ").length > 1){
+						this.createAndPositionPopup({searchText: `<span style="font-size:12px">Too much words selected!<br>Please try to select a single word!</span>`, ipaData: JSON.stringify([])});
+					}else{
+						sendMessageToBackground({action:'checkIPA', searchText:selectedTextOnly});	
+					}
+					
 				}
 			}
 
