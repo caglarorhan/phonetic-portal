@@ -17,6 +17,7 @@ const phoneticPortal = {
 		const popup = document.createElement('div');
 		popup.id = this.searchPopupId;
 		popup.style.cssText = `
+		display: inline-block;
         position: absolute;
         background-color: #ffffff;
         border: 1px solid #cccccc;
@@ -24,10 +25,13 @@ const phoneticPortal = {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         padding: 0 15px;
         z-index: 1000;
-        max-width: 300px;
+		overflow: auto;
+        width: auto;
         font-family: Arial, sans-serif;
+		font-size: 16px;
 		color: black;
-    `;;
+		white-space: pre;
+    `;
 	
 		const header = document.createElement('div');
 		header.style.cssText = `
@@ -38,10 +42,21 @@ const phoneticPortal = {
 		header.innerHTML = `<h3 style="color:red; margin-top:4px;">${data.searchText}</h3>`;
 	
 		const content = document.createElement('div');
+		content.style.cssText = `
+		display: flex;
+		flex-direction: column;
+		justify-content: top;
+		align-items: left;
+		`;
 		if(JSON.parse(data.ipaData).length === 0){
 			content.innerHTML+= this.noDataFoundMessage;	
 		}else{
-			content.innerHTML+= JSON.parse(data.ipaData).map((ipa) => `<img src="data:image/png;base64,${this.countryFlags[ipa.country]}" />: ${ipa.ipa_text}`).join('<br>');
+			content.innerHTML+= JSON.parse(data.ipaData).map((ipa) => `
+			            <div style="display: flex; margin-bottom: 1px;">
+                <img src="data:image/png;base64,${this.countryFlags[ipa.country]}" style="margin-right: 5px;" />
+                <span>${ipa.ipa_text}</span>
+            </div>
+			`);
 		}
 		//  content.innerHTML+= JSON.parse(data.ipaData).map((ipa) => `<img src="data:image/png;base64,${this.countryFlags[ipa.country]}" />: ${ipa.ipa_text}`).join('<br>');
 	
@@ -67,6 +82,7 @@ const phoneticPortal = {
 		}
 	
 		document.body.appendChild(popup);
+		this.removeAllPreviousIcons();
 	},
 	createAndPositionIcon() {
 		let allIcons = [...document.querySelectorAll(".phonetic-search-icon")];
