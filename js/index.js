@@ -55,6 +55,8 @@ const phoneticPortal = {
     },
     saveLanguageOptions(){
         localStorage.setItem('languageOptions', JSON.stringify(this.languageOptions));
+        console.log("Language settings saved!")
+        this.passLanguageOptionsToBackground();
     },
     addCommonEvents(){
         document.querySelector('.checkbox-container').addEventListener('click',(e)=>{
@@ -62,6 +64,12 @@ const phoneticPortal = {
                 this.languageOptions[e.target.value] = e.target.checked;
                 this.saveLanguageOptions();
             }
+        })
+    },
+    passLanguageOptionsToBackground(){
+        // {"us":true,"uk":false}
+        chrome.runtime.sendMessage({action: 'setLanguageOptions', languageOptions: JSON.stringify(this.languageOptions)}, response=>{
+            console.log(response);
         })
     }
 }

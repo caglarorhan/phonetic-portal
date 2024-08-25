@@ -167,6 +167,17 @@ phoneticPortal.init();
 
 // Listen for messages from content.js
 chrome.runtime.onMessage.addListener((message) => {
-    phoneticPortal.checkIPA({searchText:message.searchText});
+    switch (message.action) {
+        case "checkIPA":
+            phoneticPortal.checkIPA({searchText:message.searchText});
+            break;
+        case "setLanguageOptions":
+            phoneticPortal.sendMessageToContent({ action: 'straightMessage', messageText: message.languageOptions});
+            // TODO: Save the language options to the indexedDB and use it from there
+            break;
+        case "straightMessage":
+            //
+            break;
+    }
 });
 
