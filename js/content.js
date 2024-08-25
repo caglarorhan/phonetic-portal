@@ -4,8 +4,8 @@ const phoneticPortal = {
 	previousSearches: {}, // {"bottle": ["/ˈbɑdl/", "/ˈbɒtəl/"]}  // first value is US ipa second value is UK ipa
 	noDataFoundMessage: "No data found!",
 	countryFlags: {
-		us: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAB2AAAAdgFOeyYIAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAh1JREFUOI2dk91LU2Ecx7+/87LVSo5ujrFJQ8NgIoGDQIqMXgzJgoyIKDSIIspbiS5KGoHsD5hEQRBdFBRYGLGbdjEQiqJubLVZvp9scyKec9ZO7eWcpwtxyXSRfq9+PHw/Hx5+Dw+hLFdCH85MLuT6Fb24MyZnt6Xu78sS0TSAiGEYD+x2e2x1n1aGN7K8lc/w9zqCoxcO+CR0t7nQMxiHfF7822bMNL6nXlm+TvU4QgGtJLjxbEL6GEuNab8N1/txDd5aK6ptAkZns0g87yu/JER/01L1/pZ6RyigCQAQG0uPJJW86/JhNxJzWdTVWHFyTy0Sc5MQW3xrBGCsRgc/DOCQMPA01nFnaGa3x26FvJiD9stA3mCI/9CRNwBH9NFawXLaFgO9zYKiF/uICGm1gE/yT1gEDt+SOqptAgSeYCqZSgKeM9lV4XSrs+FhdB4+jw3XT+zASFxFp9+B434Hop+XkK5vrySA2Nx4ibacDbOiyUrPUTAYRJ5K83pLXAknbWekKIoGoKpi69/ROMaYvEkYAGYF9eItPR99tynaerBVF3iPM2hq2SGY5sZojgO5nUECgPnh1084qercRnhTyTx2dR3tJgBgjFlUVQ0DOPKffESSpE4iKpQ+E2PMkhy4+yIXeXuMgWg9isCY2L43XHez9xQRFZbPyjJ1LdBFEzO3C+NyE0stWACAczvzQqP3C7erIeAd7H+5uv8HrKfWF0/8TXUAAAAASUVORK5CYII=",
-		uk: "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAB2AAAAdgFOeyYIAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAmtJREFUOI2lk09I03EYxj/f3+Z+/l2bNs1/XWOVpYQSdRDy0sEkjYmZeQhCJT3oQYXuqYNMKEsiOpgQhX8wDBQjtENuZSWoc5cotDnnn+m2pm42fx0qCZcd6jm9h+d53vd5eV/YhZqOiSJTi8XqdjhtdjlDscsZitvhtJnMVsu1exOFu/nqX4WiKHJ52/ir9mFHTkKcGiEEBIIACCGMI7Y1Vnzfesta31jMMa68lIpz6wASwELnUIzzRseH+oKDOWkJmt1NdpCs19AwO3JSWZobVxRFs2NQv5rwcsUTMOpuP+B5wzEO7o8ME6fGywzqp9BHChaLi4yXb70dBRA1HRNF7cOOnmS9hsH4aXRBP+u1V0mM2MaVkgtA0vwortYuYtWwdKWMfPMkztUgFXlJhdL8WqBRG63CHwhRsnkcv1om7nFf2ATaAzq+VpZTdmcGfyCENlrFojfUKFY+frILlfpQmGJjk0VjPgCJMwMQFR5LUrZnhF1zVCG4tefi/gpNBBJC/JsYQJL47wjqiu4lz4spNwCpepmeuiNou58RVZq/QxT74tjo7Me77ONC8ASO1QAAZw7rvFKSVtPsXQ8RI6voqjYS29GJd2EtrJvvYiFxsRqeYCVGVuHbCJGsl5uk9qrMvtLTBstAfQaGh114A9tcIjvMoLjNhqvUhD4+mqHod5ScMoy1V2b1SwCParNzE5/22jxBhbP+LGaXN8MM5lcD5LdM/jBJ1Nqa+ZwHP09ZCBEUhvTsprRcy5eV4J5Ld3m2uDkwN5ZyvSozva5444+kqrvj54vN1jG3wzn92ztPm8zW19X33xfs5n8Hyxr8KXZ6YJkAAAAASUVORK5CYII=",
+		us:"https://raw.githubusercontent.com/caglarorhan/phonetic-portal/main/img/united-states.png",
+		uk:"https://raw.githubusercontent.com/caglarorhan/phonetic-portal/main/img/united-kingdom.png"
 	},
 	searchIconId: "phoneticSearchIcon",
 	searchPopupId: "phoneticSearchPopup",
@@ -60,6 +60,7 @@ const phoneticPortal = {
 							position: absolute;
 							width: 32px;
 							height: 32px;
+							background-image: url('https://raw.githubusercontent.com/caglarorhan/phonetic-portal/main/img/vocIPA_64.png');
 							background-size: 24px 24px;
 							background-repeat: no-repeat;
 							background-position: center;
@@ -99,7 +100,7 @@ const phoneticPortal = {
 		}else{
 			content.innerHTML+= JSON.parse(data.ipaData).map((ipa) => `
 			<div class="ipaData">
-				<img class="flag" src="data:image/png;base64,${this.countryFlags[ipa.country]}" />
+				<img class="flag" src="${this.countryFlags[ipa.country]}" />
 				<span>${ipa.ipa_text}</span>
 			</div>
 			`).join("");
@@ -137,7 +138,6 @@ const phoneticPortal = {
 		const button = document.createElement('button');
 		button.id = this.searchIconId;
 		button.className = 'phonetic-search-icon';
-		button.style.backgroundImage = `url('data:image/png;base64,${this.iconImageBase64Data}');`;
 		button.setAttribute('tabindex', '1');
 	
 		// Get the coordinates of the selected text
