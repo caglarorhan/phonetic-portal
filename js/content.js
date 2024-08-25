@@ -9,63 +9,105 @@ const phoneticPortal = {
 	},
 	searchIconId: "phoneticSearchIcon",
 	searchPopupId: "phoneticSearchPopup",
+	styleText: `
+	.phonetic-search-popup {
+							display: flex;
+							flex-direction: column;
+							position: absolute;
+							background-color: #ffffff;
+							border: 1px solid #cccccc;
+							border-radius: 8px;
+							box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+							padding: 0 15px;
+							z-index: 1000;
+							overflow: auto;
+							width: auto;
+							font-family: Arial, sans-serif;
+							font-size: 16px;
+							color: black;
+							white-space: pre;
+	}
+	.phonetic-search-popup .header {
+							font-weight: bold;
+							font-size: 18px;
+							margin-bottom: 10px;
+	}
+	.phonetic-search-popup .header h3 {
+							color: red;
+							margin-top: 4px;
+							margin-bottom: 4px;
+	}
+	.phonetic-search-popup .content {
+							display: flex;
+							flex-direction: column;
+							justify-content: flex-start;
+							align-items: flex-start;
+	}
+	.phonetic-search-popup .content .ipaData{
+							display: flex;
+							margin-bottom: 4px;
+	}
+	.phonetic-search-popup .content .ipaData img.flag{
+							margin-right: 5px;
+	}
+	.phonetic-search-popup .footer {
+							font-size: 12px;
+							color: #888888;
+							margin-top: 5px;
+							text-align:right;
+	}
+	button.phonetic-search-icon {
+							position: absolute;
+							width: 32px;
+							height: 32px;
+							background-size: 24px 24px;
+							background-repeat: no-repeat;
+							background-position: center;
+							border: none;
+							cursor: pointer;
+							z-index: 1000;
+							background-color: white;
+							border-radius: 10%;
+							box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	}						
+	`,
 	init(){
 		this.addCommonEvents();
+		this.createStyleElement(this.styleText);
+	},
+	createStyleElement(styleText) {
+		const styleElement = document.createElement('style');
+		styleElement.textContent = styleText;
+		document.head.appendChild(styleElement);
 	},
 	createAndPositionPopup(data={searchText: "Unknown", ipaData:[]}) {
 		document.getElementById(this.searchPopupId)?.remove();
 		const popup = document.createElement('div');
 		popup.id = this.searchPopupId;
-		popup.style.cssText = `
-		display: inline-block;
-        position: absolute;
-        background-color: #ffffff;
-        border: 1px solid #cccccc;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        padding: 0 15px;
-        z-index: 1000;
-		overflow: auto;
-        width: auto;
-        font-family: Arial, sans-serif;
-		font-size: 16px;
-		color: black;
-		white-space: pre;
-    `;
+		popup.classList.add('phonetic-search-popup');
 	
 		const header = document.createElement('div');
-		header.style.cssText = `
-        font-weight: bold;
-        font-size: 18px;
-        margin-bottom: 10px;
-    `;
-		header.innerHTML = `<h3 style="color:red; margin-top:4px;">${data.searchText}</h3>`;
+		header.classList.add('header');
+
+		header.innerHTML = `<h3>${data.searchText}</h3>`;
 	
 		const content = document.createElement('div');
-		content.style.cssText = `
-		display: flex;
-		flex-direction: column;
-		justify-content: top;
-		align-items: left;
-		`;
+		content.classList.add('content');
+
 		if(JSON.parse(data.ipaData).length === 0){
 			content.innerHTML+= this.noDataFoundMessage;	
 		}else{
 			content.innerHTML+= JSON.parse(data.ipaData).map((ipa) => `
-			            <div style="display: flex; margin-bottom: 1px;">
-                <img src="data:image/png;base64,${this.countryFlags[ipa.country]}" style="margin-right: 5px;" />
-                <span>${ipa.ipa_text}</span>
-            </div>
-			`);
+			<div class="ipaData">
+				<img class="flag" src="data:image/png;base64,${this.countryFlags[ipa.country]}" />
+				<span>${ipa.ipa_text}</span>
+			</div>
+			`).join("");
 		}
-		//  content.innerHTML+= JSON.parse(data.ipaData).map((ipa) => `<img src="data:image/png;base64,${this.countryFlags[ipa.country]}" />: ${ipa.ipa_text}`).join('<br>');
-	
+
 		const footer = document.createElement('div');
-		footer.style.cssText = `
-        font-size: 12px;
-        color: #888888;
-        margin-top: 10px;
-    `;
+		footer.classList.add('footer');
+		footer.innerHTML = 'Phonetic Portal';
 	
 		// Append header, content, and footer to the popup
 		popup.appendChild(header);
@@ -95,21 +137,7 @@ const phoneticPortal = {
 		const button = document.createElement('button');
 		button.id = this.searchIconId;
 		button.className = 'phonetic-search-icon';
-		button.style.cssText = `
-        position: absolute;
-        width: 32px;
-        height: 32px;
-        background-image: url('data:image/png;base64,${this.iconImageBase64Data}');
-        background-size: 24px 24px;
-        background-repeat: no-repeat;
-        background-position: center;
-        border: none;
-        cursor: pointer;
-        z-index: 1000;
-        background-color: white;
-        border-radius: 10%;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    `;
+		button.style.backgroundImage = `url('data:image/png;base64,${this.iconImageBase64Data}');`;
 		button.setAttribute('tabindex', '1');
 	
 		// Get the coordinates of the selected text
