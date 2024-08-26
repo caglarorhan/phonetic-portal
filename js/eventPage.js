@@ -3,6 +3,7 @@ const phoneticPortal = {
     dataBaseName: "PhoneticPortalDB",
     dataBaseVersion:1,
     storeName: "searches",
+    languageSelectionStoreName: "languageSelection",
     sendMessageToContent(data){
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             chrome.tabs.sendMessage(tabs[0].id, data, (response) => {
@@ -65,7 +66,11 @@ const phoneticPortal = {
                         if(theIPA.length!==0){
                             this.sendMessageToContent({ action: 'straightMessage', messageText: this.db?`IndexedDB is ready!`:`IndexedDB is not ready!`});
                             theIPA.forEach((ipa)=>{
-                                this.addDataToIndexedDB({searchText: searchData.searchText, ipaText: ipa.ipa_text, countryCode: ipa.country});
+                                this.addDataToIndexedDB(this.storeName, {
+                                    searchText: searchData.searchText,
+                                     ipaText: ipa.ipa_text,
+                                      countryCode: ipa.country,
+                                       lastSearchDate: new Date().toISOString()});
                                 this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(theIPA)});
                             })
                         }
@@ -80,13 +85,18 @@ const phoneticPortal = {
                     this.sendMessageToContent({ action: 'straightMessage', messageText:"There is no text to search!"});
                 }
     },
+
     initIndexedDB() {
         let request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
 
         request.onupgradeneeded = (event) => {
             this.db = event.target.result;
-            let objectStore = this.db.createObjectStore(this.storeName, { keyPath: "id", autoIncrement: true });
-            objectStore.createIndex("searchText", "searchText", { unique: false });
+
+            let searchStore = this.db.createObjectStore(this.storeName, { keyPath: "id", autoIncrement: true });
+            searchStore.createIndex("searchText", "searchText", { unique: false });
+
+            let languageSelectionStore = this.db.createObjectStore(this.languageSelectionStoreName, { keyPath: "language", autoIncrement: false });
+            languageSelectionStore.createIndex("language", "language", { unique: true });
         };
 
         request.onsuccess = (event) => {
@@ -98,11 +108,11 @@ const phoneticPortal = {
             this.sendMessageToContent({ action: 'straightMessage', messageText: `Error initializing IndexedDB!`});
         };
     },
-    addDataToIndexedDB(data) {
-        let transaction = this.db.transaction([this.storeName], "readwrite");
-        let objectStore = transaction.objectStore(this.storeName);
+    addDataToIndexedDB(storeName, data) {
+        let transaction = this.db.transaction([storeName], "readwrite");
+        let objectStore = transaction.objectStore(storeName);
   
-        let request = objectStore.add({ searchText: data.searchText, ipaText: data.ipaText, countryCode: data.countryCode });
+        let request = objectStore.add(data);
 
         request.onsuccess = () => {
             this.sendMessageToContent({ action: 'straightMessage', messageText: `Data added to IndexedDB successfully.`});
@@ -147,6 +157,23 @@ const phoneticPortal = {
             };
         });
     },
+    putDataToIndexedDB(storeName, data) {
+        let request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
+
+        request.onsuccess = (event) => {
+            this.db = event.target.result;
+            let transaction = this.db.transaction([storeName], "readwrite");
+            let objectStore = transaction.objectStore(storeName);
+            objectStore.clear();
+            for (let key in data) {
+                objectStore.add({ language: key, selected: data[key] });
+            }
+        };
+
+        request.onerror = () => {
+            this.sendMessageToContent({ action: 'straightMessage', messageText: `Error opening IndexedDB!`});
+        };
+    },
     utils:{
         fixedEncodeURI(str){
             return encodeURI(str).replace(/%5B/g, '[').replace(/%5D/g, ']')
@@ -174,6 +201,8 @@ chrome.runtime.onMessage.addListener((message) => {
         case "setLanguageOptions":
             phoneticPortal.sendMessageToContent({ action: 'straightMessage', messageText: message.languageOptions});
             // TODO: Save the language options to the indexedDB and use it from there
+           // {"us":true,"uk":true}
+                phoneticPortal.putDataToIndexedDB(phoneticPortal.languageSelectionStoreName, JSON.parse(message.languageOptions));
             break;
         case "straightMessage":
             //
