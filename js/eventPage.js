@@ -37,7 +37,7 @@ const phoneticPortal = {
                     // if data is already in indexedDB, get it from there
                     let result = await this.getIPAFromIndexedDB(searchData.searchText);
                     if(result.length>0){
-                        const transformedResult = result.map(item => ({
+                        let transformedResult = result.map(item => ({
                             country: item.countryCode,
                             ipa_text: item.ipaText
                         }));
@@ -52,6 +52,7 @@ const phoneticPortal = {
 
 
                         //this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(transformedResult)});
+                        transformedResult = await this.filterIPAResults(transformedResult);
                         this.sendMessageToContent({ action: 'createPopup', searchText: searchData.searchText, ipaData: JSON.stringify(transformedResult)});
                         return;
                     }else{
@@ -61,7 +62,7 @@ const phoneticPortal = {
                     let response = fetch(phoneticPortalURL, {});
                     response.then((response)=>{
                         return response.text();
-                    }).then((ipaText)=>{
+                    }).then(async (ipaText)=>{
                         let theIPA = this.utils.parseAndBack(ipaText);
                         if(theIPA.length!==0){
                             this.sendMessageToContent({ action: 'straightMessage', messageText: this.db?`IndexedDB is ready!`:`IndexedDB is not ready!`});
@@ -74,7 +75,7 @@ const phoneticPortal = {
                                 this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(theIPA)});
                             })
                         }
-
+                        theIPA = await this.filterIPAResults(theIPA);
                         this.sendMessageToContent({ action: 'createPopup', searchText: searchData.searchText, ipaData: JSON.stringify(theIPA)});
                     }).catch((error)=>{
                         this.sendMessageToContent({ action: 'straightMessage', messageText: `Background script error!`});
@@ -85,7 +86,6 @@ const phoneticPortal = {
                     this.sendMessageToContent({ action: 'straightMessage', messageText:"There is no text to search!"});
                 }
     },
-
     initIndexedDB() {
         let request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
 
@@ -173,6 +173,43 @@ const phoneticPortal = {
         request.onerror = () => {
             this.sendMessageToContent({ action: 'straightMessage', messageText: `Error opening IndexedDB!`});
         };
+    },
+    getLanguagesFromIndexedDB() {
+        return new Promise((resolve, reject) => {
+            let transaction = this.db.transaction(["languageSelection"], "readonly");
+            let objectStore = transaction.objectStore("languageSelection");
+            let request = objectStore.openCursor();
+            let languages = [];
+    
+            request.onsuccess = (event) => {
+                let cursor = event.target.result;
+                if (cursor) {
+                    languages.push(cursor.value);
+                    cursor.continue();
+                } else {
+                    resolve(languages);
+                }
+            };
+    
+            request.onerror = (event) => {
+                reject(`Error querying languageSelection store: ${event.target.errorCode}`);
+            };
+        });
+    },
+    async filterIPAResults(ipaResults){
+        // burada ipa sonuclarini db den cekilan dil seceneklerine gore filtreleyip gonderecegiz.
+        // ornegin, db de us ve uk secili ise, burada sadece us ve uk olanlari gonderecegiz.
+        // bu durumda, ipaResults arrayindeki her bir elemani, db den cekilen dil seceneklerine gore filtreleyip
+        // yeni bir array olusturup, onu dondurecegiz.
+        // Ornek ipaResults: [{"country":"us","ipa_text":"/əˈspaɪrɪŋ/"},{"country":"uk","ipa_text":"/æˈspaɪərɪŋ/"}]
+        // Ornek languages:  [{"language":"uk","selected":true},{"language":"us","selected":true}]
+        let languages = await this.getLanguagesFromIndexedDB();
+        ipaResults = ipaResults.filter((ipaResult) => {
+            const languageSetting = languages.find(languageSetting => languageSetting.language === ipaResult.country);
+            return languageSetting && languageSetting.selected;
+        });
+        this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(ipaResults)});
+        return ipaResults;
     },
     utils:{
         fixedEncodeURI(str){
