@@ -75,6 +75,7 @@ const phoneticPortal = {
 	init(){
 		this.addCommonEvents();
 		this.createStyleElement(this.styleText);
+		this.getIconPositionSettingFromBackground();
 	},
 	createStyleElement(styleText) {
 		const styleElement = document.createElement('style');
@@ -94,7 +95,6 @@ const phoneticPortal = {
 	
 		const content = document.createElement('div');
 		content.classList.add('content');
-
 		if(JSON.parse(data.ipaData).length === 0){
 			content.innerHTML+= this.noDataFoundMessage;	
 		}else{
@@ -127,6 +127,12 @@ const phoneticPortal = {
 		document.body.appendChild(popup);
 		this.removeAllPreviousIcons();
 	},
+	getIconPositionSettingFromBackground(){
+		this.sendMessageToBackground({action: 'getIconPositionSetting'});
+	},
+	saveIconPositionSettingToLocalStorage(data){
+		localStorage.setItem('iconPosition', data.place);
+	},
 	createAndPositionIcon() {
 		let allIcons = [...document.querySelectorAll(".phonetic-search-icon")];
 		if(allIcons.length > 1){
@@ -145,8 +151,22 @@ const phoneticPortal = {
 		if (selection.rangeCount > 0) {
 			const range = selection.getRangeAt(0);
 			const rect = range.getBoundingClientRect();
-			button.style.top = `${rect.top + 5 + window.scrollY}px`;
-			button.style.left = `${rect.right + window.scrollX}px`;
+
+        // Define the 8 positions
+        const positions = {
+            'top-left': { top: rect.top + window.scrollY - 30, left: rect.left + window.scrollX - 30 },
+            'top-center': { top: rect.top + window.scrollY - 30, left: rect.left + window.scrollX + (rect.width / 2) - 15 },
+            'top-right': { top: rect.top + window.scrollY - 30, left: rect.right + window.scrollX + 5 },
+            'middle-left': { top: rect.top + window.scrollY + (rect.height / 2) - 15, left: rect.left + window.scrollX - 30 },
+            'middle-right': { top: rect.top + window.scrollY + (rect.height / 2) - 15, left: rect.right + window.scrollX + 5 },
+            'bottom-left': { top: rect.bottom + window.scrollY + 5, left: rect.left + window.scrollX - 30 },
+            'bottom-center': { top: rect.bottom + window.scrollY + 5, left: rect.left + window.scrollX + (rect.width / 2) - 15 },
+            'bottom-right': { top: rect.bottom + window.scrollY + 5, left: rect.right + window.scrollX + 5 }
+        };
+
+			const iconPosition = localStorage.getItem('iconPosition') || 'top-right';
+			button.style.top = `${positions[iconPosition].top}px`;
+			button.style.left = `${positions[iconPosition].left}px`;
 		}
 		document.body.appendChild(button);
 	},
@@ -219,8 +239,12 @@ phoneticPortal.init();
 chrome.runtime.onMessage.addListener(function(request) {
 	switch(request.action){
 		case "createPopup":
+			console.log(request.ipaData);
 			phoneticPortal.createAndPositionPopup({searchText: request.searchText, ipaData: request.ipaData});
 			break;
+		case "setIconPosition":
+			phoneticPortal.saveIconPositionSettingToLocalStorage(request.position);
+			break;	
 		case "straightMessage":
 			console.log("Message: " + request.messageText);
 		break;

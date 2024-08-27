@@ -66,6 +66,22 @@ const phoneticPortal = {
                 this.saveLanguageOptions();
             }
         })
+        let allPlacementSelectorIcons = document.querySelectorAll('.symbolic-rectangle .icon');
+        
+        document.querySelector('.symbolic-rectangle').addEventListener('click', (e)=>{
+            allPlacementSelectorIcons.forEach(icon => {icon.classList.remove('selected')})
+            if([...e.target.classList].includes('icon')){
+                e.target.classList.add('selected');
+                // "top-left", middle-left", "bottom-left", "top-right", "middle-right", "bottom-right" gibi
+                this.passIconPositionPlacementToBackground(e.target.dataset.place);
+            }
+        })
+    },
+    passIconPositionPlacementToBackground(iconPlace){
+        chrome.runtime.sendMessage({action: 'setIconPlacement', iconPlace: iconPlace}, response=> {
+            console.log(response);
+        })
+
     },
     passLanguageOptionsToBackground(){
         // {"us":true,"uk":false}

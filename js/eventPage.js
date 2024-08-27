@@ -4,6 +4,7 @@ const phoneticPortal = {
     dataBaseVersion:1,
     storeName: "searches",
     languageSelectionStoreName: "languageSelection",
+    iconPlacementStoreName: "iconPlacement",
     sendMessageToContent(data){
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             chrome.tabs.sendMessage(tabs[0].id, data, (response) => {
@@ -36,6 +37,7 @@ const phoneticPortal = {
                 if(searchData.searchText){
                     // if data is already in indexedDB, get it from there
                     let result = await this.getIPAFromIndexedDB(searchData.searchText);
+                    this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(result)});
                     if(result.length>0){
                         let transformedResult = result.map(item => ({
                             country: item.countryCode,
@@ -53,6 +55,7 @@ const phoneticPortal = {
 
                         //this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(transformedResult)});
                         transformedResult = await this.filterIPAResults(transformedResult);
+                        this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(transformedResult)});
                         this.sendMessageToContent({ action: 'createPopup', searchText: searchData.searchText, ipaData: JSON.stringify(transformedResult)});
                         return;
                     }else{
@@ -76,6 +79,7 @@ const phoneticPortal = {
                             })
                         }
                         theIPA = await this.filterIPAResults(theIPA);
+                        this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(theIPA)});
                         this.sendMessageToContent({ action: 'createPopup', searchText: searchData.searchText, ipaData: JSON.stringify(theIPA)});
                     }).catch((error)=>{
                         this.sendMessageToContent({ action: 'straightMessage', messageText: `Background script error!`});
@@ -97,6 +101,8 @@ const phoneticPortal = {
 
             let languageSelectionStore = this.db.createObjectStore(this.languageSelectionStoreName, { keyPath: "language", autoIncrement: false });
             languageSelectionStore.createIndex("language", "language", { unique: true });
+
+            let iconPlacementStore = this.db.createObjectStore(this.iconPlacementStoreName, { keyPath: "id", autoIncrement: false });
         };
 
         request.onsuccess = (event) => {
@@ -164,15 +170,38 @@ const phoneticPortal = {
             this.db = event.target.result;
             let transaction = this.db.transaction([storeName], "readwrite");
             let objectStore = transaction.objectStore(storeName);
-            objectStore.clear();
-            for (let key in data) {
-                objectStore.add({ language: key, selected: data[key] });
-            }
+            //objectStore.clear();
+            objectStore.put(data);
+
         };
 
         request.onerror = () => {
             this.sendMessageToContent({ action: 'straightMessage', messageText: `Error opening IndexedDB!`});
         };
+    },
+    getDataFromIndexedDB(storeName, key) {
+        return new Promise((resolve, reject) => {
+            let request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
+
+            request.onsuccess = (event) => {
+                this.db = event.target.result;
+                let transaction = this.db.transaction([storeName], "readonly");
+                let objectStore = transaction.objectStore(storeName);
+                let query = objectStore.get(key);
+
+                query.onsuccess = (event) => {
+                    resolve(event.target.result);
+                };
+
+                query.onerror = () => {
+                    reject(`Error querying ${storeName} store: ${event.target.errorCode}`);
+                };
+            };
+
+            request.onerror = (event) => {
+                reject(`Error opening IndexedDB: ${event.target.errorCode}`);
+            };
+        });
     },
     getLanguagesFromIndexedDB() {
         return new Promise((resolve, reject) => {
@@ -187,6 +216,9 @@ const phoneticPortal = {
                     languages.push(cursor.value);
                     cursor.continue();
                 } else {
+                    //if(languages.length === 0){
+                    //    languages = [{language:"us", selected:true},{language:"uk", selected:true}];
+                    // }
                     resolve(languages);
                 }
             };
@@ -230,7 +262,7 @@ const phoneticPortal = {
             const languageSetting = languages.find(languageSetting => languageSetting.language === ipaResult.country);
             return languageSetting && languageSetting.selected;
         });
-        this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(ipaResults)});
+        this.sendMessageToContent({ action: 'straightMessage', messageText: "+++"+JSON.stringify(ipaResults)});
         return ipaResults;
     },
     utils:{
@@ -261,7 +293,13 @@ chrome.runtime.onMessage.addListener((message) => {
             phoneticPortal.sendMessageToContent({ action: 'straightMessage', messageText: message.languageOptions});
             // TODO: Save the language options to the indexedDB and use it from there
            // {"us":true,"uk":true}
-                phoneticPortal.putDataToIndexedDB(phoneticPortal.languageSelectionStoreName, JSON.parse(message.languageOptions));
+           //
+
+        let data = JSON.parse(message.languageOptions);
+        Object.keys(data).forEach((key)=>{
+            phoneticPortal.putDataToIndexedDB(phoneticPortal.languageSelectionStoreName, {language: key, selected: data[key]});
+            phoneticPortal.sendMessageToContent({ action: 'straightMessage', messageText: key});
+        });
             break;
         case "getLastSearches":
             //
@@ -271,7 +309,20 @@ chrome.runtime.onMessage.addListener((message) => {
                 chrome.runtime.sendMessage({ action: 'lastSearchResults', messageText: result});
                 phoneticPortal.sendMessageToContent({ action: 'straightMessage', messageText: `Last searches sent to content.js!`});
             })
+            break;  
+        case "setIconPlacement":
+            phoneticPortal.sendMessageToContent({ action: 'straightMessage', messageText: message.iconPlace});
+            phoneticPortal.putDataToIndexedDB(phoneticPortal.iconPlacementStoreName, {id:1, place: message.iconPlace});
             break;    
+        case "getIconPositionSetting":
+            //  get the icon position setting from indexedDB and send it to content.js
+            let iconPlacementData = phoneticPortal.getDataFromIndexedDB(phoneticPortal.iconPlacementStoreName, 1);
+            iconPlacementData.then((result) => {
+                //chrome.runtime.sendMessage({ action: 'setIconPosition', position: result });
+                phoneticPortal.sendMessageToContent({ action: 'setIconPosition', position: result});
+                phoneticPortal.sendMessageToContent({ action: 'straightMessage', messageText: `Icon position setting retrieved from IndexedDB!` });
+            });
+            break;
         case "straightMessage":
             //
             break;

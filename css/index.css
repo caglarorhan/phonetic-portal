@@ -54,18 +54,6 @@ ol li img {
 	margin-right: 5px;
 }
 
-a {
-	display: block;
-	text-align: center;
-	margin: 20px auto;
-	color: #FF4500;
-	text-decoration: none;
-	font-size: 14px;
-}
-
-a:hover {
-	text-decoration: underline;
-}
 
 .checkbox-container {
 	display: flex;
@@ -117,9 +105,41 @@ a:hover {
 			min-height: var(--tab-content-height);
 			max-height: var(--tab-content-height);
         }
+		.tab-content h3{
+			margin-left: 10px;
+			color:red;
+			font-size:16px;
+		}
 		.tab-content p{
+			margin: 10px 10px;
 			word-wrap: break-word;
 			word-wrap: break-word;
+			text-align: left;
+		}
+		.tab-content a {
+			color: #007BFF; /* Blue color for the links */
+			text-decoration: none; /* Remove underline */
+			font-weight: bold; /* Make the text bold */
+			margin-right: 10px; /* Add some space between the links */
+			transition: color 0.3s ease; /* Smooth transition for color change */
+		}
+		
+		.tab-content a:hover {
+			color: #0056b3; /* Darker blue on hover */
+			text-decoration: underline; /* Underline on hover */
+		}
+		
+		/* Style for the attribution link */
+		.tab-content p a[title="pronunciation icons"] {
+			color: #28a745; /* Green color for the attribution link */
+			text-decoration: none; /* Remove underline */
+			font-weight: bold; /* Make the text bold */
+			transition: color 0.3s ease; /* Smooth transition for color change */
+		}
+		
+		.tab-content p a[title="pronunciation icons"]:hover {
+			color: #218838; /* Darker green on hover */
+			text-decoration: underline; /* Underline on hover */
 		}
         .tab-content.active {
             display: block;
@@ -165,4 +185,106 @@ a:hover {
 			font-size: 0.8em;
 			color: #aaa;
 			text-align: right;
+		}
+
+
+
+button.get-last-searches {
+			display: block;
+			margin: 60px auto;
+			padding: 10px 20px;
+			background-color: #FF4500;
+			color: #fff;
+			border: none;
+			border-radius: 4px;
+			font-size: 16px;
+			cursor: pointer;
+		}
+
+
+span.space-and-line{
+margin-top:20px;
+display:block;
+width:100%;
+border-bottom:1px solid #ccc;
+}
+
+		/* Symbolic rectangle styles */
+		.symbolic-rectangle-container {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
+			margin-top: 20px;
+}
+
+		.symbolic-rectangle {
+			position: relative;
+			display: inline-block;
+			border: 2px dashed #000;
+			padding: 10px;
+			margin: 20px;
+		}
+		
+		.symbolic-rectangle .selected-word {
+			display: inline-block;
+			padding: 5px;
+		}
+		
+		.symbolic-rectangle .icon {
+			position: absolute;
+			width: 16px;
+			height: 16px;
+			background-color: #000;
+			cursor: pointer;
+		}
+		.symbolic-rectangle .icon:hover {
+			background-color: lightblue;
+		}
+		.symbolic-rectangle .icon.selected {
+			background-color: red;
+		}
+		
+		.symbolic-rectangle .icon.top-left {
+			top: -8px;
+			left: -8px;
+		}
+		
+		.symbolic-rectangle .icon.top-center {
+			top: -8px;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+		
+		.symbolic-rectangle .icon.top-right {
+			top: -8px;
+			right: -8px;
+		}
+		
+		.symbolic-rectangle .icon.middle-left {
+			top: 50%;
+			left: -8px;
+			transform: translateY(-50%);
+		}
+		
+		.symbolic-rectangle .icon.middle-right {
+			top: 50%;
+			right: -8px;
+			transform: translateY(-50%);
+		}
+		
+		.symbolic-rectangle .icon.bottom-left {
+			bottom: -8px;
+			left: -8px;
+		}
+		
+		.symbolic-rectangle .icon.bottom-center {
+			bottom: -8px;
+			left: 50%;
+			transform: translateX(-50%);
+		}
+		
+		.symbolic-rectangle .icon.bottom-right {
+			bottom: -8px;
+			right: -8px;
 		}
