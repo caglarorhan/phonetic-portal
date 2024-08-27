@@ -209,6 +209,12 @@ width:100%;
 border-bottom:1px solid #ccc;
 }
 
+		.icon-aligner{
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+		}
 		/* Symbolic rectangle styles */
 		.symbolic-rectangle-container {
 			display: flex;

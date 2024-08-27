@@ -67,20 +67,22 @@ const phoneticPortal = {
             }
         })
         let allPlacementSelectorIcons = document.querySelectorAll('.symbolic-rectangle .icon');
-        
+        let currentIconPlace = localStorage.getItem('iconPlace') || 'bottom-right';
+        document.querySelector(`.symbolic-rectangle [data-place=${currentIconPlace}]`).classList.add('selected');
         document.querySelector('.symbolic-rectangle').addEventListener('click', (e)=>{
             allPlacementSelectorIcons.forEach(icon => {icon.classList.remove('selected')})
             if([...e.target.classList].includes('icon')){
                 e.target.classList.add('selected');
                 // "top-left", middle-left", "bottom-left", "top-right", "middle-right", "bottom-right" gibi
+                document.querySelector(".selected-place").innerHTML = "New place will be <strong>" + e.target.dataset.place + "</strong> of the selected word!";	
                 this.passIconPositionPlacementToBackground(e.target.dataset.place);
             }
         })
     },
     passIconPositionPlacementToBackground(iconPlace){
-        chrome.runtime.sendMessage({action: 'setIconPlacement', iconPlace: iconPlace}, response=> {
-            console.log(response);
-        })
+        chrome.runtime.sendMessage({action: 'setIconPlacement', iconPlace: iconPlace});
+        // and put it into localhost of extension
+        localStorage.setItem('iconPlace', iconPlace);
 
     },
     passLanguageOptionsToBackground(){

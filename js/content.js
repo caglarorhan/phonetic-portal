@@ -222,8 +222,12 @@ const phoneticPortal = {
 		})
 	},
 	sendMessageToBackground(data={action: 'checkIPa', searchText: ''}) {
-		chrome.runtime.sendMessage(data, response=>{
-			console.log(response);
+		if (!chrome.runtime || !chrome.runtime.sendMessage) {
+			console.error('Extension context invalidated.');
+			return;
+		}
+		chrome.runtime.sendMessage(data, () => {
+			// Callback function without response parameter
 			return true;
 		});
 	}

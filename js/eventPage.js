@@ -7,11 +7,12 @@ const phoneticPortal = {
     iconPlacementStoreName: "iconPlacement",
     sendMessageToContent(data){
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            chrome.tabs.sendMessage(tabs[0].id, data, (response) => {
-                // do nothing
-            });
+            if (tabs.length > 0 && tabs[0].id !== undefined) {
+                chrome.tabs.sendMessage(tabs[0].id, data);
+            } else {
+                console.error('No active tab found or tab ID is undefined');
+            }
         });
-
     },
     init(){
         chrome.contextMenus.removeAll(()=>{
@@ -107,7 +108,7 @@ const phoneticPortal = {
 
         request.onsuccess = (event) => {
             this.db = event.target.result;
-            this.sendMessageToContent({ action: 'straightMessage', messageText: `IndexedDB initialized successfully!`});
+            //this.sendMessageToContent({ action: 'straightMessage', messageText: `IndexedDB initialized successfully!`});
         };
 
         request.onerror = () => {
