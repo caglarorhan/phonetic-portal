@@ -196,6 +196,28 @@ const phoneticPortal = {
             };
         });
     },
+    getLastSearchesFromIndexedDB() {
+        return new Promise((resolve, reject) => {
+            let transaction = this.db.transaction(["searches"], "readonly");
+            let objectStore = transaction.objectStore("searches");
+            let request = objectStore.openCursor(null, 'prev'); // Iterate in reverse order
+            let searches = [];
+    
+            request.onsuccess = (event) => {
+                let cursor = event.target.result;
+                if (cursor && searches.length < 100) {
+                    searches.push(cursor.value);
+                    cursor.continue();
+                } else {
+                    resolve(searches);
+                }
+            };
+    
+            request.onerror = (event) => {
+                reject(`Error querying searches store: ${event.target.errorCode}`);
+            };
+        });
+    },
     async filterIPAResults(ipaResults){
         // burada ipa sonuclarini db den cekilan dil seceneklerine gore filtreleyip gonderecegiz.
         // ornegin, db de us ve uk secili ise, burada sadece us ve uk olanlari gonderecegiz.
@@ -241,6 +263,15 @@ chrome.runtime.onMessage.addListener((message) => {
            // {"us":true,"uk":true}
                 phoneticPortal.putDataToIndexedDB(phoneticPortal.languageSelectionStoreName, JSON.parse(message.languageOptions));
             break;
+        case "getLastSearches":
+            //
+            phoneticPortal.sendMessageToContent({ action: 'straightMessage', messageText: `Getting last searches from IndexedDB!`});
+            let lastSearchResults = phoneticPortal.getLastSearchesFromIndexedDB();
+            lastSearchResults.then((result)=>{
+                chrome.runtime.sendMessage({ action: 'lastSearchResults', messageText: result});
+                phoneticPortal.sendMessageToContent({ action: 'straightMessage', messageText: `Last searches sent to content.js!`});
+            })
+            break;    
         case "straightMessage":
             //
             break;

@@ -1,25 +1,40 @@
+/* Calculations */
+:root {
+	--body-height: 500px;
+    --header-height: 60px;
+    --tab-container-height: 38px;
+    --tab-content-height: (var(--body-height) - var(--header-height) - var(--tab-container-height))px;
+}
+*{
+	box-sizing: border-box;
+}
+
 body {
 	font-family: Arial, sans-serif;
 	background-color: #f4f4f9;
 	margin: 0;
 	padding: 0;
     width:500px;
-	height: 500px;
+	height: var(--body-height);
+	margin: 0;
+	padding: 0;
 }
 
 .header {
-	background-color: #FF4500;
-	color: white;
+	height: var(--header-height);
+	background-color: yellow;
+	color: red;
 	padding: 10px;
 	text-align: center;
 	font-size: 24px;
 }
+.header img{
+	margin-right:20px;
+}
 
 ol {
-	background: #fff;
 	padding: 20px;
-	border-radius: 8px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	padding-top:1px;
 	max-width: 600px;
 	margin: 20px auto;
 	list-style-type: decimal;
@@ -69,3 +84,85 @@ a:hover {
 	margin-bottom: 5px;
 }
 
+
+
+        /* Tab styles */
+        .tab-container {
+			height: var(--tab-container-height);
+            margin-top: 4px;
+        }
+        .tab {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            border-bottom: none;
+			font-size: 14px;;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            transition: background-color 0.3s;
+			font-weight: bold;
+        }
+        .tab:hover {
+            background-color: #ddd;
+        }
+        .tab.active {
+            background-color: #fff;
+            border-bottom: 1px solid #fff;
+        }
+        .tab-content {
+            border: 0;
+            display: none;
+			overflow-y: auto;
+			height: 450px;
+			min-height: var(--tab-content-height);
+			max-height: var(--tab-content-height);
+        }
+		.tab-content p{
+			word-wrap: break-word;
+			word-wrap: break-word;
+		}
+        .tab-content.active {
+            display: block;
+        }
+
+		.search-result{
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			align-items: center;
+			font-size: 14px;
+		}
+
+		.search-result {
+			border: 1px solid #ccc;
+			border-radius: 8px;
+			padding: 6px;
+			margin: 2px 0;
+			background-color: #f9f9f9;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
+		
+		.search-result .search-text {
+			font-weight: bold;
+			font-size: 1.2em;
+			margin-bottom: 5px;
+		}
+		
+		.search-result .ipa-text {
+			font-style: italic;
+			color: #555;
+			margin-bottom: 5px;
+		}
+		
+		.search-result .country-code {
+			font-size: 0.9em;
+			color: #888;
+			margin-bottom: 5px;
+		}
+		
+		.search-result .search-date {
+			font-size: 0.8em;
+			color: #aaa;
+			text-align: right;
+		}
