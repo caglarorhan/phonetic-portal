@@ -46,9 +46,13 @@ const phoneticPortal = {
 	.phonetic-search-popup .content .ipaData{
 							display: flex;
 							margin-bottom: 4px;
+							align-items: center;
 	}
 	.phonetic-search-popup .content .ipaData img.flag{
 							margin-right: 5px;
+							width:16px;
+							height:16px;
+
 	}
 	.phonetic-search-popup .footer {
 							font-size: 12px;
