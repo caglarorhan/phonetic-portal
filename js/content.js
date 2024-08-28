@@ -4,8 +4,8 @@ const phoneticPortal = {
 	previousSearches: {}, // {"bottle": ["/ˈbɑdl/", "/ˈbɒtəl/"]}  // first value is US ipa second value is UK ipa
 	noDataFoundMessage: "No data found!",
 	countryFlags: {
-		us:"https://raw.githubusercontent.com/caglarorhan/phonetic-portal/main/img/united-states.png",
-		uk:"https://raw.githubusercontent.com/caglarorhan/phonetic-portal/main/img/united-kingdom.png"
+		us:"https://raw.githubusercontent.com/caglarorhan/phonetic-portal/main/img/united-states-flag.png",
+		uk:"https://raw.githubusercontent.com/caglarorhan/phonetic-portal/main/img/united-kingdom-flag.png"
 	},
 	searchIconId: "phoneticSearchIcon",
 	searchPopupId: "phoneticSearchPopup",
@@ -60,7 +60,7 @@ const phoneticPortal = {
 							position: absolute;
 							width: 32px;
 							height: 32px;
-							background-image: url('https://raw.githubusercontent.com/caglarorhan/phonetic-portal/main/img/vocIPA_64.png');
+							background-image: url('https://raw.githubusercontent.com/caglarorhan/phonetic-portal/main/img/phonetic-portal-64.png');
 							background-size: 24px 24px;
 							background-repeat: no-repeat;
 							background-position: center;
