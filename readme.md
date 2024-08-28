@@ -1,4 +1,4 @@
-# ![](./img/vocIPA_32.png) Phonetic Portal Chrome Extension
+# ![](./img/phonetic-portal-32.png) Phonetic Portal Chrome Extension
 
 ## Overview
 The **Phonetic Portal** Chrome extension allows users to view the International Phonetic Alphabet (IPA) pronunciation of the highlighted English word on any webpage. This tool is particularly useful for linguists, language learners, hard of hearing/deaf people and anyone interested in phonetics.
@@ -22,9 +22,9 @@ The **Phonetic Portal** Chrome extension allows users to view the International 
 5. A portal will appear displaying the IPA pronunciation of the highlighted word.
 
 ## Screenshots
-![Screenshot 1](./img/ss-1.JPG)
-![Screenshot 2](./img/ss-2.JPG)
-![Screenshot 3](./img/ss-3.JPG)
+![Screenshot 1](./img/screenshot-1.JPG)
+![Screenshot 2](./img/screenshot-2.JPG)
+![Screenshot 3](./img/screenshot-3.JPG)
 
 ## Support
 If you encounter any issues or have any questions, please open an issue.
