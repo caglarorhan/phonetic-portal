@@ -101,7 +101,7 @@ const phoneticPortal = {
 			content.innerHTML+= JSON.parse(data.ipaData).map((ipa) => `
 			<div class="ipaData">
 				<img class="flag" src="${this.countryFlags[ipa.country]}" />
-				<span>${ipa.ipa_text}</span>
+				<span>: ${ipa.ipa_text}</span>
 			</div>
 			`).join("");
 		}
