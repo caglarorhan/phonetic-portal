@@ -131,7 +131,11 @@ const phoneticPortal = {
 		this.sendMessageToBackground({action: 'getIconPositionSetting'});
 	},
 	saveIconPositionSettingToLocalStorage(data){
-		localStorage.setItem('iconPosition', data.place);
+		if(!data || !data.place){
+			localStorage.setItem('iconPosition', "bottom-right");
+		}else{
+			localStorage.setItem('iconPosition', data.place);
+		}
 	},
 	createAndPositionIcon() {
 		let allIcons = [...document.querySelectorAll(".phonetic-search-icon")];

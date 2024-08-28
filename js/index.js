@@ -66,8 +66,10 @@ const phoneticPortal = {
                 this.saveLanguageOptions();
             }
         })
+
         let allPlacementSelectorIcons = document.querySelectorAll('.symbolic-rectangle .icon');
-        let currentIconPlace = localStorage.getItem('iconPlace') || 'bottom-right';
+        if(!localStorage.getItem('iconPlace')){localStorage.setItem('iconPlace', 'bottom-right')};
+        let currentIconPlace = localStorage.getItem('iconPlace');
         document.querySelector(`.symbolic-rectangle [data-place=${currentIconPlace}]`).classList.add('selected');
         document.querySelector('.symbolic-rectangle').addEventListener('click', (e)=>{
             allPlacementSelectorIcons.forEach(icon => {icon.classList.remove('selected')})
