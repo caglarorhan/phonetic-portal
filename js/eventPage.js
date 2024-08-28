@@ -28,11 +28,42 @@ const phoneticPortal = {
             }
         });
        this.initIndexedDB();
+       this.initDefaultLanguageOptions();
     },
     menuItem: {
         "id":"phonetic-portal",
         "title":"Phonetic Portal",
         "contexts":["selection"]
+    },
+    initIndexedDB() {
+        let request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
+
+        request.onupgradeneeded = (event) => {
+            this.db = event.target.result;
+
+            let searchStore = this.db.createObjectStore(this.storeName, { keyPath: "id", autoIncrement: true });
+            searchStore.createIndex("searchText", "searchText", { unique: false });
+
+            let languageSelectionStore = this.db.createObjectStore(this.languageSelectionStoreName, { keyPath: "language", autoIncrement: false });
+            languageSelectionStore.createIndex("language", "language", { unique: true });
+
+            let iconPlacementStore = this.db.createObjectStore(this.iconPlacementStoreName, { keyPath: "id", autoIncrement: false });
+        };
+
+        request.onsuccess = (event) => {
+            this.db = event.target.result;
+            //this.sendMessageToContent({ action: 'straightMessage', messageText: `IndexedDB initialized successfully!`});
+        };
+
+        request.onerror = () => {
+            this.sendMessageToContent({ action: 'straightMessage', messageText: `Error initializing IndexedDB!`});
+        };
+    },
+    initDefaultLanguageOptions(){
+        let languageOptions = [{language:"us", selected:true},{language:"uk", selected:true}];
+        languageOptions.forEach((languageOption)=>{
+            this.putDataToIndexedDB(this.languageSelectionStoreName, languageOption);
+        });
     },
     async checkIPA(searchData){
                 if(searchData.searchText){
@@ -90,30 +121,6 @@ const phoneticPortal = {
                 }else{
                     this.sendMessageToContent({ action: 'straightMessage', messageText:"There is no text to search!"});
                 }
-    },
-    initIndexedDB() {
-        let request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
-
-        request.onupgradeneeded = (event) => {
-            this.db = event.target.result;
-
-            let searchStore = this.db.createObjectStore(this.storeName, { keyPath: "id", autoIncrement: true });
-            searchStore.createIndex("searchText", "searchText", { unique: false });
-
-            let languageSelectionStore = this.db.createObjectStore(this.languageSelectionStoreName, { keyPath: "language", autoIncrement: false });
-            languageSelectionStore.createIndex("language", "language", { unique: true });
-
-            let iconPlacementStore = this.db.createObjectStore(this.iconPlacementStoreName, { keyPath: "id", autoIncrement: false });
-        };
-
-        request.onsuccess = (event) => {
-            this.db = event.target.result;
-            //this.sendMessageToContent({ action: 'straightMessage', messageText: `IndexedDB initialized successfully!`});
-        };
-
-        request.onerror = () => {
-            this.sendMessageToContent({ action: 'straightMessage', messageText: `Error initializing IndexedDB!`});
-        };
     },
     addDataToIndexedDB(storeName, data) {
         let transaction = this.db.transaction([storeName], "readwrite");
