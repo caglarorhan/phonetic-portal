@@ -80,6 +80,20 @@ const phoneticPortal = {
                 this.passIconPositionPlacementToBackground(e.target.dataset.place);
             }
         })
+
+        document.querySelector('#tab_2').addEventListener('keyup',(e)=>{
+            if(e.target.classList.contains('search-in-history')){
+                console.log(e.target.value);
+                document.querySelectorAll('.search-result').forEach(searchResult => {
+                if(searchResult.querySelector('.search-text').textContent.includes(e.target.value)){
+                    searchResult.style.display = '';
+                }else{
+                    searchResult.style.display = 'none';
+                }
+            })
+            }
+
+        })
     },
     passIconPositionPlacementToBackground(iconPlace){
         chrome.runtime.sendMessage({action: 'setIconPlacement', iconPlace: iconPlace});
@@ -146,7 +160,9 @@ function openTab(evt, tabName) {
                 if (message.action === 'lastSearchResults') {
                     console.log('Last 10 searches:', message.messageText);
                     // Handle the received data as needed
-                    document.querySelector('#tab_2').innerHTML=``;
+                    document.querySelector('#tab_2').innerHTML=`<input type="text" class="search-in-history" placeholder="Search in history">`;
+                    
+        let searchInHistoryInput = document.querySelector("#tab_2 input.search-in-history");
                      message.messageText.forEach(search => {
                         document.querySelector('#tab_2').innerHTML +=`
                         <div class="search-result">
