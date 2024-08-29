@@ -96,9 +96,12 @@ const phoneticPortal = {
                     let phoneticPortalURL = this.phoneticPortalURL + this.utils.fixedEncodeURI(searchData.searchText);
                     let response = fetch(phoneticPortalURL, {});
                     response.then((response)=>{
+                        this.sendMessageToContent({ action: 'straightMessage', messageText:"Cevap dondu"});
                         return response.text();
                     }).then(async (ipaText)=>{
+                        this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(ipaText)});
                         let theIPA = this.utils.parseAndBack(ipaText);
+                        this.sendMessageToContent({ action: 'straightMessage', messageText: JSON.stringify(theIPA)});
                         if(theIPA.length!==0){
                             this.sendMessageToContent({ action: 'straightMessage', messageText: this.db?`IndexedDB is ready!`:`IndexedDB is not ready!`});
                             theIPA.forEach((ipa)=>{
@@ -280,9 +283,10 @@ const phoneticPortal = {
         parseAndBack(fullText){
             const ipaValues = [];
             if(!fullText.includes('<div class="ipa-section">')) return ipaValues;
-            let ipa_1 = fullText.split('<div class="ipa-section">')[1].split('<h3>')[1].split('</h3>')[0];
+            let splittedFullText = fullText.split('<span class="span-replace-h3">');
+            let ipa_1 = splittedFullText[1].split('</span>')[0];
             ipaValues.push({country:'us', ipa_text:ipa_1});
-            let ipa_2 = fullText.split('<div class="ipa-section">')[1].split('<h3>')[2].split('</h3>')[0];
+            let ipa_2 = splittedFullText[2].split('</span>')[0];
             (ipa_2.startsWith("/") && ipa_2.endsWith("/"))?ipaValues.push({country:'uk', ipa_text:ipa_2}):"";
             return ipaValues;
         }
@@ -295,6 +299,7 @@ phoneticPortal.init();
 chrome.runtime.onMessage.addListener((message) => {
     switch (message.action) {
         case "checkIPA":
+            phoneticPortal.sendMessageToContent({ action: 'straightMessage', messageText: `Checking IPA for ${message.searchText}!`});
             phoneticPortal.checkIPA({searchText:message.searchText});
             break;
         case "setLanguageOptions":
