@@ -47,12 +47,12 @@ const phoneticPortal = {
 	.phonetic-search-popup .content .ipaData{
 							display: flex;
 							margin-bottom: 4px;
-							align-items: baseline;
 	}
 	.phonetic-search-popup .content .ipaData img.flag{
 							margin-right: 5px;
 							width:24px;
 							height:24px;
+							margin-bottom:unset;
 
 	}
 	.phonetic-search-popup .footer {

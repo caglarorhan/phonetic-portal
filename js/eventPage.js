@@ -286,7 +286,7 @@ const phoneticPortal = {
             let splittedFullText = fullText.split('<span class="span-replace-h3">');
             let ipa_1 = splittedFullText[1].split('</span>')[0];
             ipaValues.push({country:'us', ipa_text:ipa_1});
-            let ipa_2 = splittedFullText[2].split('</span>')[0];
+            let ipa_2 = splittedFullText[2].split('</span>')[0].replace(/\s+/g, '');
             (ipa_2.startsWith("/") && ipa_2.endsWith("/"))?ipaValues.push({country:'uk', ipa_text:ipa_2}):"";
             return ipaValues;
         }
