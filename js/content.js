@@ -50,8 +50,8 @@ const phoneticPortal = {
 	}
 	.phonetic-search-popup .content .ipaData img.flag{
 							margin-right: 5px;
-							width:16px;
-							height:16px;
+							width:24px;
+							height:24px;
 
 	}
 	.phonetic-search-popup .footer {

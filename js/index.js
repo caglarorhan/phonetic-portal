@@ -81,19 +81,13 @@ const phoneticPortal = {
             }
         })
 
-        document.querySelector('#tab_2').addEventListener('keyup',(e)=>{
-            if(e.target.classList.contains('search-in-history')){
-                console.log(e.target.value);
-                document.querySelectorAll('.search-result').forEach(searchResult => {
-                if(searchResult.querySelector('.search-text').textContent.includes(e.target.value)){
-                    searchResult.style.display = '';
-                }else{
-                    searchResult.style.display = 'none';
-                }
-            })
-            }
-
-        })
+        document.querySelector('#tab_2').addEventListener('keyup', (e) => {
+          if (e.target.classList.contains('search-in-history')) {
+            const searchValue = e.target.value.toLowerCase();
+            document.querySelectorAll('.search-result')
+              .forEach(searchResult => searchResult.style.display = searchResult.querySelector('.search-text').textContent.toLowerCase().includes(searchValue) ? '' : 'none');
+          }
+        });
     },
     passIconPositionPlacementToBackground(iconPlace){
         chrome.runtime.sendMessage({action: 'setIconPlacement', iconPlace: iconPlace});
