@@ -297,3 +297,10 @@ border-bottom:1px solid #ccc;
 			bottom: -8px;
 			right: -8px;
 		}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}

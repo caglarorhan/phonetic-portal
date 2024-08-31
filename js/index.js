@@ -155,7 +155,9 @@ function openTab(evt, tabName) {
                 if (message.action === 'lastSearchResults') {
                     console.log('Last 10 searches:', message.messageText);
                     // Handle the received data as needed
-                    document.querySelector('#tab_2').innerHTML=`<input type="text" class="search-in-history" placeholder="Search in history">`;
+                    document.querySelector('#tab_2').innerHTML=`<div class="search-container">
+    <input type="text" class="search-in-history" placeholder="Search in history">
+</div>`;
                     
         let searchInHistoryInput = document.querySelector("#tab_2 input.search-in-history");
                      message.messageText.forEach(search => {
