@@ -14,7 +14,7 @@ body {
 	background-color: #f4f4f9;
 	margin: 0;
 	padding: 0;
-    width:500px;
+    width:570px;
 	height: var(--body-height);
 	margin: 0;
 	padding: 0;
@@ -144,6 +144,9 @@ ol li img {
         .tab-content.active {
             display: block;
         }
+		#tab_5{
+			overflow: hidden;
+		}
 
 		.search-result{
 			display: flex;
