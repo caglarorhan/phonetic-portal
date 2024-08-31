@@ -22,8 +22,8 @@ The **Phonetic Portal** Chrome extension allows users to view the International 
 
 ## Screenshots
 ![Screenshot 1](./img/screenshot-1.JPG)
-![Screenshot 2](./img/screenshot-2.JPG)
-![Screenshot 3](./img/screenshot-3.JPG)
+![Icon GIF](./img/GIF-1.gif)
+![Context Menu GIF](./img/GIF-2.gif)
 
 ## Support
 If you encounter any issues or have any questions, please open an issue.
