@@ -35,6 +35,7 @@ body {
 ol {
 	padding: 20px;
 	padding-top:1px;
+    padding-bottom:0px;
 	max-width: 600px;
 	margin: 1px auto;
 	list-style-type: decimal;
