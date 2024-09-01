@@ -24,19 +24,19 @@ body {
 	height: var(--header-height);
 	background-color: yellow;
 	color: red;
-	padding: 10px;
+	padding: 15px;
 	text-align: center;
 	font-size: 24px;
 }
 .header img{
-	margin-right:20px;
+	margin-right:50px;
 }
 
 ol {
 	padding: 20px;
 	padding-top:1px;
 	max-width: 600px;
-	margin: 20px auto;
+	margin: 1px auto;
 	list-style-type: decimal;
 }
 
@@ -297,3 +297,12 @@ border-bottom:1px solid #ccc;
 			bottom: -8px;
 			right: -8px;
 		}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}

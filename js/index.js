@@ -121,6 +121,7 @@ const phoneticPortal = {
 window.addEventListener('load', function() {
     phoneticPortal.init();
     activateTabs();
+    addFeedbackLinkListener();
 })
 
 function activateTabs() {
@@ -133,6 +134,18 @@ function activateTabs() {
     document.querySelectorAll('.tab-container .tab')[0].click();
 }
 
+function addFeedbackLinkListener() {
+    const feedbackLink = document.getElementById('feedback-link');
+    if (feedbackLink) {
+        feedbackLink.addEventListener('click', (event) => {
+            event.preventDefault();
+            const feedbackTabButton = document.querySelector('.tab[data-tab="tab_5"]');
+            if (feedbackTabButton) {
+                feedbackTabButton.click();
+            }
+        });
+    }
+}
 
 function openTab(evt, tabName) {
     var i, tabcontent, tablinks;
@@ -155,7 +168,9 @@ function openTab(evt, tabName) {
                 if (message.action === 'lastSearchResults') {
                     console.log('Last 10 searches:', message.messageText);
                     // Handle the received data as needed
-                    document.querySelector('#tab_2').innerHTML=`<input type="text" class="search-in-history" placeholder="Search in history">`;
+                    document.querySelector('#tab_2').innerHTML=`<div class="search-container">
+    <input type="text" class="search-in-history" placeholder="Search in history">
+</div>`;
                     
         let searchInHistoryInput = document.querySelector("#tab_2 input.search-in-history");
                      message.messageText.forEach(search => {
