@@ -21,9 +21,9 @@ The **Phonetic Portal** Chrome extension allows users to view the International 
 4. A portal will appear displaying the IPA pronunciation of the highlighted word.
 
 ## Screenshots
-![Screenshot 1](./img/screenshot-1.png)
-![Icon GIF](./img/GIF-1.gif)
-![Context Menu GIF](./img/GIF-2.gif)
+![Screenshot 1](./img/main-page-screenshot.png)
+![Icon GIF](./img/icon-GIF.gif)
+![Context Menu GIF](./img/context-menu-GIF.gif)
 
 ## Support
 If you encounter any issues or have any questions, please open an issue.
