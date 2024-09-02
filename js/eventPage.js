@@ -1,20 +1,17 @@
 const phoneticPortal = {
+    version: "2024.0.1",
     phoneticPortalURL:"https://www.vocabulary.com/dictionary/",
     dataBaseName: "PhoneticPortalDB",
     dataBaseVersion:1,
     storeName: "searches",
     languageSelectionStoreName: "languageSelection",
     iconPlacementStoreName: "iconPlacement",
-    sendMessageToContent(data){
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs.length > 0 && tabs[0].id !== undefined) {
-                chrome.tabs.sendMessage(tabs[0].id, data);
-            } else {
-                console.error('No active tab found or tab ID is undefined');
-            }
-        });
+    menuItem: {
+        "id":"phonetic-portal",
+        "title":"Phonetic Portal",
+        "contexts":["selection"]
     },
-    init(){
+    async init(){
         chrome.contextMenus.removeAll(()=>{
             chrome.contextMenus.create(this.menuItem, () => {
                 if (chrome.runtime.lastError) {
@@ -27,37 +24,55 @@ const phoneticPortal = {
                 this.checkIPA({searchText:info.selectionText});
             }
         });
-       this.initIndexedDB();
-       this.initDefaultLanguageOptions();
-    },
-    menuItem: {
-        "id":"phonetic-portal",
-        "title":"Phonetic Portal",
-        "contexts":["selection"]
+       try {
+        this.initIndexedDB();
+        this.initDefaultLanguageOptions();
+        }
+        catch (error) {
+            this.sendMessageToContent({ action: 'straightMessage', messageText: `Error initializing IndexedDB!`});
+        }
+
+       
     },
     initIndexedDB() {
-        let request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
 
-        request.onupgradeneeded = (event) => {
-            this.db = event.target.result;
+        return new Promise((resolve, reject) => {
+            let request = indexedDB.open(this.dataBaseName, this.dataBaseVersion);
 
-            let searchStore = this.db.createObjectStore(this.storeName, { keyPath: "id", autoIncrement: true });
-            searchStore.createIndex("searchText", "searchText", { unique: false });
+            request.onupgradeneeded = (event) => {
+                this.db = event.target.result;
 
-            let languageSelectionStore = this.db.createObjectStore(this.languageSelectionStoreName, { keyPath: "language", autoIncrement: false });
-            languageSelectionStore.createIndex("language", "language", { unique: true });
+                let searchStore = this.db.createObjectStore(this.storeName, { keyPath: "id", autoIncrement: true });
+                searchStore.createIndex("searchText", "searchText", { unique: false });
 
-            let iconPlacementStore = this.db.createObjectStore(this.iconPlacementStoreName, { keyPath: "id", autoIncrement: false });
-        };
+                let languageSelectionStore = this.db.createObjectStore(this.languageSelectionStoreName, { keyPath: "language", autoIncrement: false });
+                languageSelectionStore.createIndex("language", "language", { unique: true });
+                
 
-        request.onsuccess = (event) => {
-            this.db = event.target.result;
-            //this.sendMessageToContent({ action: 'straightMessage', messageText: `IndexedDB initialized successfully!`});
-        };
+                let iconPlacementStore = this.db.createObjectStore(this.iconPlacementStoreName, { keyPath: "id", autoIncrement: false });
+            };
 
-        request.onerror = () => {
-            this.sendMessageToContent({ action: 'straightMessage', messageText: `Error initializing IndexedDB!`});
-        };
+            request.onsuccess = (event) => {
+                this.db = event.target.result;
+                resolve();
+                //this.sendMessageToContent({ action: 'straightMessage', messageText: `IndexedDB initialized successfully!`});
+            };
+
+            request.onerror = () => {
+                this.sendMessageToContent({ action: 'straightMessage', messageText: `Error initializing IndexedDB!`});
+                reject(`Error initializing IndexedDB!`);
+            };
+        });
+
+    },
+    sendMessageToContent(data){
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs.length > 0 && tabs[0].id !== undefined) {
+                chrome.tabs.sendMessage(tabs[0].id, data);
+            } else {
+                console.error('No active tab found or tab ID is undefined');
+            }
+        });
     },
     initDefaultLanguageOptions(){
         let languageOptions = [{language:"us", selected:true},{language:"uk", selected:true}];
@@ -241,6 +256,11 @@ const phoneticPortal = {
     },
     getLastSearchesFromIndexedDB() {
         return new Promise((resolve, reject) => {
+            if (!this.db) {
+                reject('Database not initialized');
+                return;
+            }
+
             let transaction = this.db.transaction(["searches"], "readonly");
             let objectStore = transaction.objectStore("searches");
             let request = objectStore.openCursor(null, 'prev'); // Iterate in reverse order
