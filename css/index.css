@@ -27,6 +27,8 @@ body {
 	padding: 15px;
 	text-align: center;
 	font-size: 24px;
+	user-select: none;
+	-webkit-user-select: none;
 }
 .header img{
 	margin-right:50px;
@@ -80,6 +82,7 @@ ol li img {
         .tab-container {
 			height: var(--tab-container-height);
             margin-top: 4px;
+			border-bottom: 1px solid #CCCCCC;
         }
         .tab {
             display: inline-block;
@@ -91,13 +94,16 @@ ol li img {
             background-color: #f1f1f1;
             transition: background-color 0.3s;
 			font-weight: bold;
+			border-radius: 4px 4px 0 0;
+			user-select: none;
+			-webkit-user-select: none;
         }
         .tab:hover {
             background-color: #ddd;
         }
         .tab.active {
-            background-color: #fff;
-            border-bottom: 1px solid #fff;
+            background-color: #F4F4F9;
+			border-bottom: 1px solid #F4F4F9;
         }
         .tab-content {
             border: 0;
