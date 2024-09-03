@@ -3,3 +3,6 @@
 
 # VsCode related files.
 .vscode
+
+#zip files for google marketplace
+./mustignore/
