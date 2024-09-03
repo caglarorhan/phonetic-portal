@@ -1,4 +1,3 @@
-
 const phoneticPortal = {
     defaultIconPosition: 'top-center',
     previousSearches:{}, // {"us":{searchText: "hello", ipaText: "həˈloʊ"}, "uk":{searchText: "hello", ipaText: "həˈloʊ"}}
