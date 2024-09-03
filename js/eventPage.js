@@ -360,5 +360,6 @@ chrome.runtime.onMessage.addListener((message) => {
             //
             break;
     }
+    return false;
 });
 
