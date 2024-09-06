@@ -9,12 +9,12 @@ The **Phonetic Portal** Chrome extension allows users to view the International 
 - Lightweight and fast.
 
 ## Installation
-1. Go to the [Chrome Web Store](https://chrome.google.com/webstore).
-2. Search for "Phonetic Portal".
-3. Click "Add to Chrome" to install the extension.
+1. Go to the [Chrome Web Store](https://chromewebstore.google.com/detail/phonetic-portal/pljlkokfoeoppaihfpdjomnmpkmaiikk).
+2. Click "Add to Chrome" to install the extension.
 
 ## Usage
 1. After installing the extension, navigate to any webpage.
+   - If web page already navigated, refresh the page one time.
 2. Highlight the word you want to see the IPA pronunciation for.
 3. Click the appeared Phonetic Portal menu.
    - Or right-click to open the context menu and select "Phonetic Portal".
