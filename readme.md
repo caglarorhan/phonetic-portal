@@ -14,7 +14,7 @@ The **Phonetic Portal** Chrome extension allows users to view the International 
 
 ## Usage
 1. After installing the extension, navigate to any webpage.
-   - If web page already navigated, refresh the page one time.
+   - If the web page was already open, it's better to refresh the page.
 2. Highlight the word you want to see the IPA pronunciation for.
 3. Click the appeared Phonetic Portal menu.
    - Or right-click to open the context menu and select "Phonetic Portal".
