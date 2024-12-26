@@ -2,40 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>IPA Pronunciation - Phonetic Portal</title>
+    <title>Phonetic Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/index.css">
     <script src="./js/index.js"></script>
 </head>
 <body>
     <div class="header">
-        <img src="./img/phonetic-portal-64.png" alt="Phonetic Portal Logo" style="width: 32px; height: 32px; vertical-align: middle; object-fit: contain;"> <strong> Phonetic Portal<small><sup>©</sup></small></strong> IPA Pronunciation
+        <div class="header-content">
+            <img src="./img/phonetic-portal-64.png" alt="Phonetic Portal Logo">
+            <strong>Phonetic Portal<small><sup>©</sup></small></strong>
+        </div>
     </div>
 
     <div class="tab-container">
         <div class="tab active" data-tab="tab_1">How to use?</div>
-        <div class="tab" data-tab="tab_2">Last Searches</div>
+        <div class="tab" data-tab="tab_2">Last searches</div>
         <div class="tab" data-tab="tab_3">Settings</div>
         <div class="tab" data-tab="tab_4">About</div>
         <div class="tab" data-tab="tab_5">Feedback</div>
     </div>
+
     <div id="tab_1" class="tab-content active">
         <ol>
-            <li>Highlight a word</li>
-            <li>Follow one of the two options below
+            <li>
+                <span>Highlight a word</span>
+            </li>
+            <li>
+                <span>Follow one of the two options below</span>
                 <ol>
-                    <li>Option 1: Click on the <img alt="Phonetic Portal icon" src="./img/phonetic-portal-24.png" style="width: 16px; height: 16px; vertical-align: middle; object-fit: contain;"> icon  that appears</li>
-                    <li>Option 2: Right-click and select <img alt="Phonetic Portal icon" src="./img/phonetic-portal-24.png" style="width: 16px; height: 16px; vertical-align: middle; object-fit: contain;"><strong>Phonetic Portal </strong> from the context menu</li>
+                    <li>
+                        <span>
+                            Option 1: Click on the <img alt="Phonetic Portal icon" src="./img/phonetic-portal-24.png" style="width: 16px; height: 16px; vertical-align: middle;"> icon that appears
+                        </span>
+                    </li>
+                    <li>
+                        <span>
+                            Option 2: Right-click and select <img alt="Phonetic Portal icon" src="./img/phonetic-portal-24.png" style="width: 16px; height: 16px; vertical-align: middle;"> <strong>Phonetic Portal</strong> from the context menu
+                        </span>
+                    </li>
                 </ol>
             </li>
+            <li>
+                <span>Read the IPA pronunciation in the portal</span>
             </li>
-            <li>Read the IPA pronunciation in the portal</li>
         </ol>
     </div>
     <div id="tab_2" class="tab-content">
-        <!-- Settings Tab-->
-        
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="Search in history">
+        </div>
 
+        <div class="search-result">
+            <div class="search-text">pronunciation</div>
+            <div class="ipa-text">/prəʊnʌnsɪ'eɪʃən/</div>
+            <div class="dialect-info">
+                <img src="./img/united-kingdom-flag.png" alt="UK" class="dialect-flag">
+                <span class="country-code">UK</span>
+            </div>
+            <div class="search-date">2024-12-26 05:00</div>
+        </div>
+
+        <div class="search-result">
+            <div class="search-text">pronunciation</div>
+            <div class="ipa-text">/prə'nʌnsi'eɪʃən/</div>
+            <div class="dialect-info">
+                <img src="./img/united-states-flag.png" alt="US" class="dialect-flag">
+                <span class="country-code">US</span>
+            </div>
+            <div class="search-date">2024-12-26 05:00</div>
+        </div>
     </div>
     <div id="tab_3" class="tab-content">
         <fieldset>
@@ -76,7 +112,7 @@
         </div>
     </div>
     <div id="tab_5" class="tab-content">
-        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSew0pp1bmarkvFc5Sn0XT87ri4XGcqnYuD5ADjPk67tE36jvg/viewform?embedded=true" width="570" height="500" frameborder="0" marginheight="0" marginwidth="0" title="Feedback Form">Loading…</iframe>
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSew0pp1bmarkvFc5Sn0XT87ri4XGcqnYuD5ADjPk67tE36jvg/viewform?embedded=true" width="540" height="500" frameborder="0" marginheight="0" marginwidth="0" class="feedback-form" title="Feedback Form">Loading…</iframe>
     </div>
 </body>
 </html>

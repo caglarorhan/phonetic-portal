@@ -100,23 +100,26 @@ function openTab(evt, tabName) {
             chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 if (message.action === 'lastSearchResults') {
                     console.log('Last 10 searches:', message.messageText);
-                    // Handle the received data as needed
                     document.querySelector('#tab_2').innerHTML=`<div class="search-container">
     <input type="text" class="search-in-history" placeholder="Search in history">
 </div>`;
-                    
-        let searchInHistoryInput = document.querySelector("#tab_2 input.search-in-history");
-                     message.messageText.forEach(search => {
+
+                    let searchInHistoryInput = document.querySelector("#tab_2 input.search-in-history");
+                    message.messageText.forEach(search => {
+                        const flagSrc = search.countryCode === 'uk' ? './img/united-kingdom-flag.png' : './img/united-states-flag.png';
+                        const dateObj = new Date(search.lastSearchDate);
+                        const date = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
                         document.querySelector('#tab_2').innerHTML +=`
                         <div class="search-result">
                             <div class="search-text">${search.searchText}</div>
                             <div class="ipa-text">${search.ipaText}</div>
-                            <div class="country-code">${search.countryCode}</div>
-                            <div class="search-date">${search.lastSearchDate}</div>
+                            <div class="dialect-info">
+                                <img src="${flagSrc}" alt="${search.countryCode.toUpperCase()}" class="dialect-flag">
+                                <span class="country-code">${search.countryCode.toUpperCase()}</span>
+                            </div>
+                            <div class="search-date">${date}</div>
                         </div>
-
-                        
-                        `  	
-                     })
+                        `
+                    })
                 }
             });
