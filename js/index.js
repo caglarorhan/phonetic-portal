@@ -36,9 +36,18 @@ const phoneticPortal = {
 
     },
     getLastSearches(){
-        chrome.runtime.sendMessage({action: 'getLastSearches'}, response => {
-            console.log(response);
-        });
+        let newLastSearchesButton = document.createElement('button');
+        newLastSearchesButton.textContent = 'Get Last Searches';
+        newLastSearchesButton.classList.add('get-last-searches');
+        document.querySelector('#tab_2').appendChild(newLastSearchesButton);
+        newLastSearchesButton.addEventListener('click', ()=>{
+            chrome.runtime.sendMessage({action: 'getLastSearches'}, response => {
+                console.log(response);
+            })
+        })
+        chrome.runtime.sendMessage({action: 'getLastSearches'}, response =>{
+            // console.log(response);
+        })
     }
 }
 
