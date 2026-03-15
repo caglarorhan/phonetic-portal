@@ -491,6 +491,12 @@ ol ol li:hover {
     object-fit: cover;
 }
 
+.dialect-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dim);
+}
+
 .search-date {
     grid-area: date;
     color: var(--text-dim);

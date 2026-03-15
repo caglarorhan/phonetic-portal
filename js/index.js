@@ -163,6 +163,8 @@ chrome.runtime.onMessage.addListener((message) => {
                 flagImg.alt = search.countryCode.toUpperCase();
                 flagImg.className = 'dialect-flag';
                 dialectDiv.appendChild(flagImg);
+                const countryLabel = createTextElement('span', 'dialect-label', search.countryCode.toUpperCase());
+                dialectDiv.appendChild(countryLabel);
 
                 const dateObj = new Date(search.lastSearchDate);
                 const date = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
