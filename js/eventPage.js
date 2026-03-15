@@ -1,10 +1,11 @@
 const phoneticPortal = {
     phoneticPortalURL: "https://www.vocabulary.com/dictionary/",
     dataBaseName: "PhoneticPortalDB",
-    dataBaseVersion: 1,
+    dataBaseVersion: 2,
     storeName: "searches",
     languageSelectionStoreName: "languageSelection",
     iconPlacementStoreName: "iconPlacement",
+    ipaGuideStoreName: "ipaGuide",
     notFoundCache: new Set(),
     dbReady: null,
     menuItem: {
@@ -28,6 +29,7 @@ const phoneticPortal = {
         try {
             await this.initIndexedDB();
             this.initDefaultLanguageOptions();
+            this.initDefaultIpaGuide();
         } catch (error) {
             console.error('Error initializing extension:', error);
         }
@@ -39,13 +41,23 @@ const phoneticPortal = {
             request.onupgradeneeded = (event) => {
                 this.db = event.target.result;
 
-                const searchStore = this.db.createObjectStore(this.storeName, { keyPath: "id", autoIncrement: true });
-                searchStore.createIndex("searchText", "searchText", { unique: false });
+                if (!this.db.objectStoreNames.contains(this.storeName)) {
+                    const searchStore = this.db.createObjectStore(this.storeName, { keyPath: "id", autoIncrement: true });
+                    searchStore.createIndex("searchText", "searchText", { unique: false });
+                }
 
-                const languageSelectionStore = this.db.createObjectStore(this.languageSelectionStoreName, { keyPath: "language", autoIncrement: false });
-                languageSelectionStore.createIndex("language", "language", { unique: true });
+                if (!this.db.objectStoreNames.contains(this.languageSelectionStoreName)) {
+                    const languageSelectionStore = this.db.createObjectStore(this.languageSelectionStoreName, { keyPath: "language", autoIncrement: false });
+                    languageSelectionStore.createIndex("language", "language", { unique: true });
+                }
 
-                this.db.createObjectStore(this.iconPlacementStoreName, { keyPath: "id", autoIncrement: false });
+                if (!this.db.objectStoreNames.contains(this.iconPlacementStoreName)) {
+                    this.db.createObjectStore(this.iconPlacementStoreName, { keyPath: "id", autoIncrement: false });
+                }
+
+                if (!this.db.objectStoreNames.contains(this.ipaGuideStoreName)) {
+                    this.db.createObjectStore(this.ipaGuideStoreName, { keyPath: "id", autoIncrement: false });
+                }
             };
 
             request.onsuccess = (event) => {
@@ -64,6 +76,9 @@ const phoneticPortal = {
                 chrome.tabs.sendMessage(tabs[0].id, data);
             }
         });
+    },
+    initDefaultIpaGuide() {
+        this.putDataToIndexedDB(this.ipaGuideStoreName, { id: 1, enabled: true });
     },
     initDefaultLanguageOptions() {
         const languageOptions = [
@@ -311,6 +326,19 @@ chrome.runtime.onMessage.addListener((message) => {
                 phoneticPortal.getDataFromIndexedDB(phoneticPortal.iconPlacementStoreName, 1)
                     .then((result) => {
                         phoneticPortal.sendMessageToContent({ action: 'setIconPosition', position: result });
+                    });
+                break;
+            case "setIpaGuide":
+                phoneticPortal.putDataToIndexedDB(
+                    phoneticPortal.ipaGuideStoreName,
+                    { id: 1, enabled: message.enabled }
+                );
+                phoneticPortal.sendMessageToContent({ action: 'setIpaGuideSetting', enabled: message.enabled });
+                break;
+            case "getIpaGuideSetting":
+                phoneticPortal.getDataFromIndexedDB(phoneticPortal.ipaGuideStoreName, 1)
+                    .then((result) => {
+                        phoneticPortal.sendMessageToContent({ action: 'setIpaGuideSetting', enabled: result ? result.enabled : true });
                     });
                 break;
         }

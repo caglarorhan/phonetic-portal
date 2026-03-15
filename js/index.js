@@ -26,6 +26,16 @@ const phoneticPortal = {
             }
         });
 
+        // IPA Guide toggle
+        const guideToggle = document.getElementById('ipaGuideToggle');
+        const savedGuide = localStorage.getItem('showIpaGuide');
+        guideToggle.checked = savedGuide !== 'false';
+        guideToggle.addEventListener('change', () => {
+            const enabled = guideToggle.checked;
+            localStorage.setItem('showIpaGuide', String(enabled));
+            chrome.runtime.sendMessage({ action: 'setIpaGuide', enabled });
+        });
+
         // Event delegation on tab_2 container — survives innerHTML replacement
         document.querySelector('#tab_2').addEventListener('keyup', (e) => {
             if (e.target.classList.contains('search-in-history')) {
