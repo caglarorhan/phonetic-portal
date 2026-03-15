@@ -6,6 +6,7 @@ const phoneticPortal = {
     languageSelectionStoreName: "languageSelection",
     iconPlacementStoreName: "iconPlacement",
     notFoundCache: new Set(),
+    dbReady: null,
     menuItem: {
         "id": "phonetic-portal",
         "title": "Phonetic Portal",
@@ -276,41 +277,43 @@ const phoneticPortal = {
     }
 };
 
-phoneticPortal.init();
+phoneticPortal.dbReady = phoneticPortal.init();
 
 // Listen for messages from content.js and popup
 chrome.runtime.onMessage.addListener((message) => {
-    switch (message.action) {
-        case "checkIPA":
-            phoneticPortal.checkIPA({ searchText: message.searchText });
-            break;
-        case "setLanguageOptions": {
-            const data = JSON.parse(message.languageOptions);
-            Object.keys(data).forEach((key) => {
-                phoneticPortal.putDataToIndexedDB(
-                    phoneticPortal.languageSelectionStoreName,
-                    { language: key, selected: data[key] }
-                );
-            });
-            break;
-        }
-        case "getLastSearches":
-            phoneticPortal.getLastSearchesFromIndexedDB().then((result) => {
-                chrome.runtime.sendMessage({ action: 'lastSearchResults', messageText: result });
-            });
-            break;
-        case "setIconPlacement":
-            phoneticPortal.putDataToIndexedDB(
-                phoneticPortal.iconPlacementStoreName,
-                { id: 1, place: message.iconPlace }
-            );
-            break;
-        case "getIconPositionSetting":
-            phoneticPortal.getDataFromIndexedDB(phoneticPortal.iconPlacementStoreName, 1)
-                .then((result) => {
-                    phoneticPortal.sendMessageToContent({ action: 'setIconPosition', position: result });
+    phoneticPortal.dbReady.then(() => {
+        switch (message.action) {
+            case "checkIPA":
+                phoneticPortal.checkIPA({ searchText: message.searchText });
+                break;
+            case "setLanguageOptions": {
+                const data = JSON.parse(message.languageOptions);
+                Object.keys(data).forEach((key) => {
+                    phoneticPortal.putDataToIndexedDB(
+                        phoneticPortal.languageSelectionStoreName,
+                        { language: key, selected: data[key] }
+                    );
                 });
-            break;
-    }
-    return false;
+                break;
+            }
+            case "getLastSearches":
+                phoneticPortal.getLastSearchesFromIndexedDB().then((result) => {
+                    chrome.runtime.sendMessage({ action: 'lastSearchResults', messageText: result });
+                });
+                break;
+            case "setIconPlacement":
+                phoneticPortal.putDataToIndexedDB(
+                    phoneticPortal.iconPlacementStoreName,
+                    { id: 1, place: message.iconPlace }
+                );
+                break;
+            case "getIconPositionSetting":
+                phoneticPortal.getDataFromIndexedDB(phoneticPortal.iconPlacementStoreName, 1)
+                    .then((result) => {
+                        phoneticPortal.sendMessageToContent({ action: 'setIconPosition', position: result });
+                    });
+                break;
+        }
+    });
+    return true;
 });

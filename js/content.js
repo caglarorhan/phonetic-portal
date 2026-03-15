@@ -551,13 +551,22 @@ const phoneticPortal = {
     },
 
     sendMessageToBackground(data = { action: 'checkIPA', searchText: '' }) {
-        if (!chrome.runtime || !chrome.runtime.sendMessage) {
-            console.error('Extension context invalidated.');
-            return;
+        try {
+            if (!chrome.runtime || !chrome.runtime.sendMessage) {
+                throw new Error('Extension context invalidated.');
+            }
+            chrome.runtime.sendMessage(data, () => {
+                if (chrome.runtime.lastError) {
+                    console.error('Message send failed:', chrome.runtime.lastError.message);
+                    this.removePortal();
+                    this.removeAllPreviousIcons();
+                }
+            });
+        } catch (e) {
+            console.error('Extension context invalidated:', e.message);
+            this.removePortal();
+            this.removeAllPreviousIcons();
         }
-        chrome.runtime.sendMessage(data, () => {
-            return true;
-        });
     }
 };
 
