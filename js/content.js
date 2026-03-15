@@ -12,68 +12,6 @@ const IPA_SUPRASEGMENTALS = new Set(['ˈ', 'ˌ', 'ː', '/', '.', '|', '‖']);
 // Multi-char phonemes matched longest-first
 const MULTI_CHAR_PHONEMES = ['t͡ʃ', 'd͡ʒ', 'tʃ', 'dʒ', 'aɪ', 'aʊ', 'eɪ', 'oʊ', 'ɔɪ', 'ɪə', 'eə', 'ʊə'];
 
-// Phoneme descriptions for hover tooltips
-const PHONEME_DESCRIPTIONS = {
-    // Vowels
-    'i': "the 'ee' sound in 'see'",
-    'ɪ': "the 'i' sound in 'sit'",
-    'e': "the 'e' sound in 'bed'",
-    'ɛ': "the 'e' sound in 'dress'",
-    'æ': "the 'a' sound in 'cat'",
-    'ɑ': "the 'a' sound in 'father'",
-    'ɒ': "the 'o' sound in 'lot'",
-    'ɔ': "the 'aw' sound in 'thought'",
-    'o': "the 'o' sound in 'go'",
-    'ʊ': "the 'oo' sound in 'book'",
-    'u': "the 'oo' sound in 'goose'",
-    'ʌ': "the 'u' sound in 'cup'",
-    'ə': "the 'a' sound in 'about'",
-    'ɜ': "the 'ur' sound in 'nurse'",
-    'ɐ': "the 'a' sound in 'comma'",
-    'a': "the 'a' sound in 'father'",
-    // Diphthongs
-    'aɪ': "the 'eye' sound in 'my'",
-    'aʊ': "the 'ow' sound in 'now'",
-    'eɪ': "the 'ay' sound in 'say'",
-    'oʊ': "the 'oh' sound in 'go'",
-    'ɔɪ': "the 'oy' sound in 'boy'",
-    'ɪə': "the 'ear' sound in 'near'",
-    'eə': "the 'air' sound in 'square'",
-    'ʊə': "the 'oor' sound in 'cure'",
-    // Consonants
-    'p': "the 'p' sound in 'pen'",
-    'b': "the 'b' sound in 'bad'",
-    't': "the 't' sound in 'tea'",
-    'd': "the 'd' sound in 'dog'",
-    'k': "the 'k' sound in 'cat'",
-    'g': "the 'g' sound in 'go'",
-    'f': "the 'f' sound in 'fun'",
-    'v': "the 'v' sound in 'van'",
-    'θ': "the 'th' sound in 'think'",
-    'ð': "the 'th' sound in 'this'",
-    's': "the 's' sound in 'see'",
-    'z': "the 'z' sound in 'zoo'",
-    'ʃ': "the 'sh' sound in 'she'",
-    'ʒ': "the 'zh' sound in 'vision'",
-    'h': "the 'h' sound in 'hat'",
-    'tʃ': "the 'ch' sound in 'church'",
-    't͡ʃ': "the 'ch' sound in 'church'",
-    'dʒ': "the 'j' sound in 'judge'",
-    'd͡ʒ': "the 'j' sound in 'judge'",
-    'm': "the 'm' sound in 'man'",
-    'n': "the 'n' sound in 'no'",
-    'ŋ': "the 'ng' sound in 'sing'",
-    'l': "the 'l' sound in 'let'",
-    'r': "the 'r' sound in 'run'",
-    'ɹ': "the 'r' sound in 'run'",
-    'j': "the 'y' sound in 'yes'",
-    'w': "the 'w' sound in 'win'",
-    'ʔ': "a glottal stop, as in 'uh-oh'",
-    // Suprasegmentals
-    'ˈ': 'primary stress (next syllable is stressed)',
-    'ˌ': 'secondary stress',
-    'ː': 'long vowel',
-};
 
 const COUNTRY_FLAG_URLS = {
     us: chrome.runtime.getURL('img/united-states-flag.png'),
@@ -93,7 +31,9 @@ const SHADOW_STYLES = `
         border-radius: 12px;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(168, 85, 247, 0.1);
         color: #f1f5f9;
-        width: 280px;
+        width: auto;
+        min-width: 200px;
+        max-width: 400px;
         overflow: hidden;
         font-size: 14px;
         line-height: 1.4;
@@ -157,26 +97,6 @@ const SHADOW_STYLES = `
         border-radius: 3px;
         padding: 0 1px;
         transition: background 0.15s ease;
-    }
-    .pp-phoneme[data-desc]:hover {
-        background: rgba(255, 255, 255, 0.1);
-    }
-    .pp-phoneme[data-desc]:hover::after {
-        content: attr(data-desc);
-        position: absolute;
-        bottom: calc(100% + 6px);
-        left: 50%;
-        transform: translateX(-50%);
-        background: #1e293b;
-        color: #e2e8f0;
-        font-size: 12px;
-        padding: 6px 10px;
-        border-radius: 6px;
-        white-space: nowrap;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        pointer-events: none;
-        z-index: 10;
     }
     .pp-footer {
         padding: 8px 18px;
@@ -275,39 +195,6 @@ const SHADOW_STYLES = `
         flex-shrink: 0;
     }
 
-    /* IPA Symbol Guide (inside legend) */
-    .pp-guide-divider {
-        height: 1px;
-        background: rgba(255, 255, 255, 0.08);
-        margin-bottom: 10px;
-    }
-    .pp-guide-title {
-        font-size: 13px;
-        font-weight: 600;
-        color: #cbd5e1;
-        margin-bottom: 8px;
-    }
-    .pp-guide-list {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-    .pp-guide-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 13px;
-    }
-    .pp-guide-symbol {
-        font-size: 16px;
-        font-weight: 600;
-        width: 28px;
-        text-align: center;
-        flex-shrink: 0;
-    }
-    .pp-guide-desc {
-        color: #94a3b8;
-    }
 
     /* Error state */
     .pp-error {
@@ -324,7 +211,7 @@ const SHADOW_STYLES = `
 
 const phoneticPortal = {
     defaultIconPosition: 'top-center',
-    iconUrl: chrome.runtime.getURL('img/phonetic-portal-32.png'),
+    iconUrl: chrome.runtime.getURL('img/phonetic-portal-128.png'),
     searchIconId: 'phoneticSearchIcon',
     shadowHost: null,
     shadowRoot: null,
@@ -400,11 +287,6 @@ const phoneticPortal = {
             const span = document.createElement('span');
             span.className = `pp-${token.type}`;
             span.textContent = token.text;
-            const desc = PHONEME_DESCRIPTIONS[token.text];
-            if (desc) {
-                span.classList.add('pp-phoneme');
-                span.setAttribute('data-desc', desc);
-            }
             container.appendChild(span);
         }
         return container;
@@ -538,45 +420,6 @@ const phoneticPortal = {
                 });
                 legend.appendChild(legendItems);
 
-                // IPA Symbol Guide — inside legend, toggled by ? button
-                const guideDivider = document.createElement('div');
-                guideDivider.className = 'pp-guide-divider';
-                guideDivider.style.marginTop = '10px';
-                legend.appendChild(guideDivider);
-                const guideTitle = document.createElement('div');
-                guideTitle.className = 'pp-guide-title';
-                guideTitle.textContent = 'IPA Symbol Guide';
-                legend.appendChild(guideTitle);
-
-                const guideList = document.createElement('div');
-                guideList.className = 'pp-guide-list';
-
-                // Collect unique phonemes from the first dialect's IPA text
-                const firstIPA = ipaDataArray[0].ipa_text.replace(/\//g, '');
-                const tokens = this.tokenizeIPA(firstIPA);
-                const seen = new Set();
-                tokens.forEach((token) => {
-                    if (token.type === 'supra' && !PHONEME_DESCRIPTIONS[token.text]) return;
-                    if (seen.has(token.text)) return;
-                    seen.add(token.text);
-
-                    const desc = PHONEME_DESCRIPTIONS[token.text];
-                    if (!desc) return;
-
-                    const row = document.createElement('div');
-                    row.className = 'pp-guide-row';
-                    const symbol = document.createElement('span');
-                    symbol.className = `pp-guide-symbol pp-${token.type}`;
-                    symbol.textContent = token.text;
-                    const descSpan = document.createElement('span');
-                    descSpan.className = 'pp-guide-desc';
-                    descSpan.textContent = desc;
-                    row.appendChild(symbol);
-                    row.appendChild(descSpan);
-                    guideList.appendChild(row);
-                });
-
-                legend.appendChild(guideList);
                 portal.appendChild(legend);
             }
         }
