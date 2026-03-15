@@ -676,7 +676,7 @@ const phoneticPortal = {
                     legend.appendChild(guideDivider);
                     const guideTitle = document.createElement('div');
                     guideTitle.className = 'pp-guide-title';
-                    guideTitle.textContent = 'IPA Symbol Guide';
+                    guideTitle.textContent = 'Symbol Guide';
                     legend.appendChild(guideTitle);
 
                     const guideList = document.createElement('div');
