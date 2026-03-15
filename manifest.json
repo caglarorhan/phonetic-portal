@@ -1,7 +1,7 @@
 {
   "name": "Phonetic Portal",
   "description" : "Opens a portal and displays the phonetic pronunciation of the highlighted word.",
-  "version": "2024.0.1",
+  "version": "2026.1.0",
   "manifest_version": 3,
   "action": {
     "default_popup": "index.html",
@@ -27,6 +27,12 @@
     {
       "matches": ["<all_urls>"],
       "js": ["./js/content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["img/*"],
+      "matches": ["<all_urls>"]
     }
   ]
 }

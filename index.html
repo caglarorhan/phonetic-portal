@@ -5,40 +5,39 @@
     <title>Phonetic Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/index.css">
-    <script src="./js/index.js"></script>
 </head>
 <body>
     <div class="header">
         <div class="header-content">
             <img src="./img/phonetic-portal-64.png" alt="Phonetic Portal Logo">
-            <strong>Phonetic Portal<small><sup>©</sup></small></strong>
+            <strong>Phonetic Portal</strong>
         </div>
     </div>
 
-    <div class="tab-container">
-        <div class="tab active" data-tab="tab_1">How to use?</div>
-        <div class="tab" data-tab="tab_2">Last searches</div>
-        <div class="tab" data-tab="tab_3">Settings</div>
-        <div class="tab" data-tab="tab_4">About</div>
-        <div class="tab" data-tab="tab_5">Feedback</div>
+    <div class="tab-container" role="tablist">
+        <button class="tab active" data-tab="tab_1" role="tab" aria-selected="true">How to use?</button>
+        <button class="tab" data-tab="tab_2" role="tab" aria-selected="false">Last searches</button>
+        <button class="tab" data-tab="tab_3" role="tab" aria-selected="false">Settings</button>
+        <button class="tab" data-tab="tab_4" role="tab" aria-selected="false">About</button>
+        <button class="tab" data-tab="tab_5" role="tab" aria-selected="false">Feedback</button>
     </div>
 
-    <div id="tab_1" class="tab-content active">
+    <div id="tab_1" class="tab-content active" role="tabpanel">
         <ol>
             <li>
                 <span>Highlight a word</span>
             </li>
             <li>
-                <span>Follow one of the two options below</span>
+                <span>Follow one of the options below</span>
                 <ol>
                     <li>
                         <span>
-                            Option 1: Click on the <img alt="Phonetic Portal icon" src="./img/phonetic-portal-24.png" style="width: 16px; height: 16px; vertical-align: middle;"> icon that appears
+                            Option 1: Click on the <img alt="Phonetic Portal icon" src="./img/phonetic-portal-24.png" class="inline-icon"> icon that appears
                         </span>
                     </li>
                     <li>
                         <span>
-                            Option 2: Right-click and select <img alt="Phonetic Portal icon" src="./img/phonetic-portal-24.png" style="width: 16px; height: 16px; vertical-align: middle;"> <strong>Phonetic Portal</strong> from the context menu
+                            Option 2: Right-click and select <img alt="Phonetic Portal icon" src="./img/phonetic-portal-24.png" class="inline-icon"> <strong>Phonetic Portal</strong> from the context menu
                         </span>
                     </li>
                 </ol>
@@ -48,36 +47,16 @@
             </li>
         </ol>
     </div>
-    <div id="tab_2" class="tab-content">
+    <div id="tab_2" class="tab-content" role="tabpanel">
         <div class="search-container">
-            <input type="text" class="search-box" placeholder="Search in history">
-        </div>
-
-        <div class="search-result">
-            <div class="search-text">pronunciation</div>
-            <div class="ipa-text">/prəʊnʌnsɪ'eɪʃən/</div>
-            <div class="dialect-info">
-                <img src="./img/united-kingdom-flag.png" alt="UK" class="dialect-flag">
-                <span class="country-code">UK</span>
-            </div>
-            <div class="search-date">2024-12-26 05:00</div>
-        </div>
-
-        <div class="search-result">
-            <div class="search-text">pronunciation</div>
-            <div class="ipa-text">/prə'nʌnsi'eɪʃən/</div>
-            <div class="dialect-info">
-                <img src="./img/united-states-flag.png" alt="US" class="dialect-flag">
-                <span class="country-code">US</span>
-            </div>
-            <div class="search-date">2024-12-26 05:00</div>
+            <input type="text" class="search-in-history" placeholder="Search in history">
         </div>
     </div>
-    <div id="tab_3" class="tab-content">
+    <div id="tab_3" class="tab-content" role="tabpanel">
         <fieldset>
             <legend>Icon Placement Around Selected Word</legend>
             <div class="icon-aligner">
-                <div class="symbolic-rectangle" title="Click a square to choose where you want your icon to appear.">
+                <div class="symbolic-rectangle" title="Click a black square to choose where you want your icon to appear.">
                     <div class="icon top-left" data-place="top-left"></div>
                     <div class="icon top-center" data-place="top-center"></div>
                     <div class="icon top-right" data-place="top-right"></div>
@@ -88,31 +67,38 @@
                     <div class="icon bottom-right" data-place="bottom-right"></div>
                     <span class="selected-word">Selected Word</span>
                 </div>
-                <div>You can click the boxes to choose the position of the IPA icon.</div>
+                <div class="placement-hint">Click the purple squares to choose where the IPA icon appears.</div>
             </div>
             <div class="selected-place"></div>
         </fieldset>
     </div>
-    <div id="tab_4" class="tab-content">
-        <div>
-            <p><strong>Phonetic Portal</strong> is a simple and basic tool designed to help users understand and pronounce words using the International Phonetic Alphabet (IPA). Whether you're a linguist, language learner, or just curious about phonetics, this application provides an easy and intuitive way to convert words into their phonetic representation.</p>
-            <p>Features:</p>
-            <ul>
-                <li>Instant IPA conversion for the highlighted words</li>
+    <div id="tab_4" class="tab-content about-tab" role="tabpanel">
+        <p><strong>Phonetic Portal</strong> is a tool designed to help users understand and pronounce words using the International Phonetic Alphabet (IPA). Whether you're a linguist, language learner, or just curious about phonetics, this extension provides an easy way to convert words into their phonetic representation.</p>
+
+        <div class="about-section">
+            <h3 class="about-heading">Features</h3>
+            <ul class="feature-list">
+                <li>Instant IPA conversion for highlighted words</li>
                 <li>Supports multiple dialects</li>
-                <li>Easy-to-use interface with context menu integration</li>
-                <li>History of last searches for quick reference</li>
-                <li>Customizable settings to suit your preferences</li>
+                <li>Context menu integration</li>
+                <li>Search history for quick reference</li>
+                <li>Customizable icon placement</li>
             </ul>
-            <p>Developed with a focus on accuracy and user experience, Phonetic Portal aims to be an indispensable resource for anyone interested in the international phonetics of human speech.</p>
-            <p><strong>Feedbacks:</strong> You can send all types of feedbacks like comments, questions, bug reports and feature request to us. Please use the Google Form at the <a href="" id="feedback-link" style="margin-right: 1px;">Feedback</a> tab.</p>
-            <p><strong>GitHub:</strong> Alternatively, you can use Phonetic Portal's GitHub repository's <a href="https://github.com/caglarorhan/phonetic-portal/issues/new" target="_blank" rel="noopener" style="margin-right: 1px;">issues</a> section to provide feedback.</p>
-            <p><strong>Icons from:</strong> <a href="https://www.flaticon.com/free-icons/pronunciation" title="pronunciation icons">Pronunciation icons created by Freepik - Flaticon</a></p>
-            <p><strong>Developers:</strong> <a href="https://github.com/Ksenofanex" target="_blank" rel="noopener" style="margin-right: 1px;">Burak Kadir Er</a> & <a href="https://github.com/caglarorhan" target="_blank" rel="noopener">Caglar Orhan</a></p>
+        </div>
+
+        <div class="about-section">
+            <h3 class="about-heading">Feedback</h3>
+            <p>Send comments, questions, bug reports, or feature requests via the <a href="" id="feedback-link">Feedback</a> tab or on <a href="https://github.com/caglarorhan/phonetic-portal/issues/new" target="_blank" rel="noopener">GitHub Issues</a>.</p>
+        </div>
+
+        <div class="about-section about-credits">
+            <p><strong>Icons:</strong> <a href="https://www.flaticon.com/free-icons/pronunciation" title="pronunciation icons">Pronunciation icons by Freepik - Flaticon</a></p>
+            <p><strong>Developers:</strong> <a href="https://github.com/Ksenofanex" target="_blank" rel="noopener">Burak Kadir Er</a> & <a href="https://github.com/caglarorhan" target="_blank" rel="noopener">Caglar Orhan</a></p>
         </div>
     </div>
-    <div id="tab_5" class="tab-content">
-        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSew0pp1bmarkvFc5Sn0XT87ri4XGcqnYuD5ADjPk67tE36jvg/viewform?embedded=true" width="540" height="500" frameborder="0" marginheight="0" marginwidth="0" class="feedback-form" title="Feedback Form">Loading…</iframe>
+    <div id="tab_5" class="tab-content" role="tabpanel">
+        <iframe data-src="https://docs.google.com/forms/d/e/1FAIpQLSew0pp1bmarkvFc5Sn0XT87ri4XGcqnYuD5ADjPk67tE36jvg/viewform?embedded=true" class="feedback-form" title="Feedback Form">Loading…</iframe>
     </div>
+    <script src="./js/index.js" defer></script>
 </body>
 </html>
