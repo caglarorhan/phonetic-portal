@@ -71,7 +71,7 @@ const SHADOW_STYLES = `
         transition: background 0.15s ease;
     }
     .pp-dialect:hover {
-        background: rgba(255, 255, 255, 0.06);
+        background: rgba(168, 85, 247, 0.08);
     }
     .pp-colon {
         color: #475569;
@@ -196,6 +196,89 @@ const SHADOW_STYLES = `
     }
 
 
+    /* Header button group */
+    .pp-header-btns {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Pin button */
+    .pp-pin-btn {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.05);
+        color: #94a3b8;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+        flex-shrink: 0;
+        padding: 0;
+    }
+    .pp-pin-btn:hover {
+        background: rgba(168, 85, 247, 0.15);
+        border-color: #a855f7;
+        color: #a855f7;
+    }
+    .pp-pin-btn svg {
+        width: 12px;
+        height: 12px;
+        fill: currentColor;
+    }
+    .pp-pin-btn.active {
+        background: rgba(239, 68, 68, 0.15);
+        border-color: #ef4444;
+        color: #ef4444;
+    }
+    .pp-pin-btn.active:hover {
+        background: rgba(239, 68, 68, 0.25);
+    }
+
+    /* Copy button */
+    .pp-copy-btn {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        border: none;
+        background: transparent;
+        color: #475569;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+        flex-shrink: 0;
+        padding: 0;
+        margin-left: auto;
+    }
+    .pp-copy-btn:hover {
+        background: rgba(168, 85, 247, 0.15);
+        color: #a855f7;
+    }
+    .pp-copy-btn svg {
+        width: 14px;
+        height: 14px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .pp-copy-btn.copied {
+        color: #4ade80;
+        gap: 3px;
+        width: auto;
+    }
+    .pp-copy-btn .pp-copied-text {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
     /* Error state */
     .pp-error {
         padding: 12px 18px;
@@ -215,6 +298,7 @@ const phoneticPortal = {
     searchIconId: 'phoneticSearchIcon',
     shadowHost: null,
     shadowRoot: null,
+    isPinned: false,
 
     init() {
         this.createIconStyles();
@@ -297,6 +381,7 @@ const phoneticPortal = {
         this.shadowHost?.remove();
         this.shadowHost = null;
         this.shadowRoot = null;
+        this.isPinned = false;
     },
 
     createAndPositionPopup(data = { searchText: 'Unknown', ipaData: '[]', loading: false }) {
@@ -356,16 +441,41 @@ const phoneticPortal = {
                     : 'Try selecting a different word';
                 portal.appendChild(hint);
             } else {
-                // Add ? button to header
+                // Header button group
+                const btnGroup = document.createElement('div');
+                btnGroup.className = 'pp-header-btns';
+
+                // ? button
                 const helpBtn = document.createElement('button');
                 helpBtn.className = 'pp-help-btn';
                 helpBtn.textContent = '?';
+                helpBtn.title = 'Show guide';
                 helpBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const legend = portal.querySelector('.pp-legend');
                     if (legend) legend.classList.toggle('visible');
                 });
-                headerRow.appendChild(helpBtn);
+                btnGroup.appendChild(helpBtn);
+
+                // Pin / Close button
+                const pinBtn = document.createElement('button');
+                pinBtn.className = 'pp-pin-btn';
+                pinBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15.113 3.21l.094.083 5.5 5.5a1 1 0 01.083 1.32l-.083.094-4 4a1 1 0 01-.112.097l-.1.063-1.5.875-3.084 3.083a1 1 0 01-1.32.083l-.094-.083-2.5-2.5-3.793 3.793a1 1 0 01-1.497-1.32l.083-.094 3.793-3.793-2.5-2.5a1 1 0 01-.083-1.32l.083-.094 3.084-3.083.874-1.5a1 1 0 01.16-.212l4-4a1 1 0 011.32-.083z"/></svg>';
+                pinBtn.title = 'Pin portal';
+                pinBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!this.isPinned) {
+                        this.isPinned = true;
+                        pinBtn.classList.add('active');
+                        pinBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>';
+                        pinBtn.title = 'Close portal';
+                    } else {
+                        this.removePortal();
+                    }
+                });
+                btnGroup.appendChild(pinBtn);
+
+                headerRow.appendChild(btnGroup);
 
                 // IPA data rows
                 const content = document.createElement('div');
@@ -384,9 +494,27 @@ const phoneticPortal = {
                     colon.className = 'pp-colon';
                     colon.textContent = ':';
 
+                    const clipboardSvg = '<svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>';
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'pp-copy-btn';
+                    copyBtn.innerHTML = clipboardSvg;
+                    copyBtn.title = 'Copy IPA';
+                    copyBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(ipa.ipa_text).then(() => {
+                            copyBtn.classList.add('copied');
+                            copyBtn.innerHTML = '<span class="pp-copied-text">Copied!</span><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+                            setTimeout(() => {
+                                copyBtn.classList.remove('copied');
+                                copyBtn.innerHTML = clipboardSvg;
+                            }, 1500);
+                        });
+                    });
+
                     dialectRow.appendChild(flag);
                     dialectRow.appendChild(colon);
                     dialectRow.appendChild(this.buildColoredIPA(ipa.ipa_text.replace(/\//g, '')));
+                    dialectRow.appendChild(copyBtn);
                     content.appendChild(dialectRow);
                 });
 
@@ -513,7 +641,9 @@ const phoneticPortal = {
             const icon = document.getElementById(searchIconId);
             const selection = window.getSelection();
             if (selection.isCollapsed) {
-                this.removePortal();
+                if (!this.isPinned) {
+                    this.removePortal();
+                }
                 icon?.remove();
             } else {
                 if (e.target.id === searchIconId) {
@@ -546,7 +676,9 @@ const phoneticPortal = {
 
         document.addEventListener('selectionchange', () => {
             this.removeAllPreviousIcons();
-            this.removePortal();
+            if (!this.isPinned) {
+                this.removePortal();
+            }
         });
     },
 
