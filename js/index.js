@@ -1,69 +1,75 @@
 const phoneticPortal = {
     defaultIconPosition: 'top-center',
-    previousSearches:{}, // {"us":{searchText: "hello", ipaText: "həˈloʊ"}, "uk":{searchText: "hello", ipaText: "həˈloʊ"}}
-    languageOptions: {us:true, uk:true}, // {us:true, uk:true, au:false, ca:false, nz:false, za:false, ie:false, in:false, ph:false, sg:false}
-    async init(){
+    async init() {
         this.addCommonEvents();
         this.getLastSearches();
     },
-    addCommonEvents(){
-        let allPlacementSelectorIcons = document.querySelectorAll('.symbolic-rectangle .icon');
-        if(!localStorage.getItem('iconPlace')){localStorage.setItem('iconPlace', this.defaultIconPosition)};
-        let currentIconPlace = localStorage.getItem('iconPlace');
+    addCommonEvents() {
+        const allPlacementSelectorIcons = document.querySelectorAll('.symbolic-rectangle .icon');
+        if (!localStorage.getItem('iconPlace')) {
+            localStorage.setItem('iconPlace', this.defaultIconPosition);
+        }
+        const currentIconPlace = localStorage.getItem('iconPlace');
         document.querySelector(`.symbolic-rectangle [data-place=${currentIconPlace}]`).classList.add('selected');
-        document.querySelector('.symbolic-rectangle').addEventListener('click', (e)=>{
-            allPlacementSelectorIcons.forEach(icon => {icon.classList.remove('selected')})
-            if([...e.target.classList].includes('icon')){
+        document.querySelector('.symbolic-rectangle').addEventListener('click', (e) => {
+            allPlacementSelectorIcons.forEach(icon => icon.classList.remove('selected'));
+            if ([...e.target.classList].includes('icon')) {
                 e.target.classList.add('selected');
-                // "top-left", middle-left", "bottom-left", "top-right", "middle-right", "bottom-right" gibi
-                document.querySelector(".selected-place").innerHTML = "New place will be <strong>" + e.target.dataset.place + "</strong> of the selected word!";	
+                const placeEl = document.querySelector(".selected-place");
+                placeEl.textContent = '';
+                placeEl.append('New place will be ');
+                const strong = document.createElement('strong');
+                strong.textContent = e.target.dataset.place;
+                placeEl.appendChild(strong);
+                placeEl.append(' of the selected word!');
                 this.passIconPositionPlacementToBackground(e.target.dataset.place);
             }
-        })
+        });
 
+        // IPA Guide toggle
+        const guideToggle = document.getElementById('ipaGuideToggle');
+        const savedGuide = localStorage.getItem('showIpaGuide');
+        guideToggle.checked = savedGuide !== 'false';
+        guideToggle.addEventListener('change', () => {
+            const enabled = guideToggle.checked;
+            localStorage.setItem('showIpaGuide', String(enabled));
+            chrome.runtime.sendMessage({ action: 'setIpaGuide', enabled });
+        });
+
+        // Event delegation on tab_2 container — survives innerHTML replacement
         document.querySelector('#tab_2').addEventListener('keyup', (e) => {
-          if (e.target.classList.contains('search-in-history')) {
-            const searchValue = e.target.value.toLowerCase();
-            document.querySelectorAll('.search-result')
-              .forEach(searchResult => searchResult.style.display = searchResult.querySelector('.search-text').textContent.toLowerCase().includes(searchValue) ? '' : 'none');
-          }
+            if (e.target.classList.contains('search-in-history')) {
+                const searchValue = e.target.value.toLowerCase();
+                document.querySelectorAll('.search-result')
+                    .forEach(searchResult => {
+                        const textEl = searchResult.querySelector('.search-text');
+                        searchResult.style.display = textEl && textEl.textContent.toLowerCase().includes(searchValue) ? '' : 'none';
+                    });
+            }
         });
     },
-    passIconPositionPlacementToBackground(iconPlace){
-        chrome.runtime.sendMessage({action: 'setIconPlacement', iconPlace: iconPlace});
-        // and put it into localhost of extension
+    passIconPositionPlacementToBackground(iconPlace) {
+        chrome.runtime.sendMessage({ action: 'setIconPlacement', iconPlace: iconPlace });
         localStorage.setItem('iconPlace', iconPlace);
-
     },
-    getLastSearches(){
-        let newLastSearchesButton = document.createElement('button');
-        newLastSearchesButton.textContent = 'Get Last Searches';
-        newLastSearchesButton.classList.add('get-last-searches');
-        document.querySelector('#tab_2').appendChild(newLastSearchesButton);
-        newLastSearchesButton.addEventListener('click', ()=>{
-            chrome.runtime.sendMessage({action: 'getLastSearches'}, response => {
-                console.log(response);
-            })
-        })
-        chrome.runtime.sendMessage({action: 'getLastSearches'}, response =>{
-            // console.log(response);
-        })
+    getLastSearches() {
+        chrome.runtime.sendMessage({ action: 'getLastSearches' });
     }
-}
+};
 
-window.addEventListener('load', function() {
+document.addEventListener('DOMContentLoaded', function () {
     phoneticPortal.init();
     activateTabs();
     addFeedbackLinkListener();
-})
+});
 
 function activateTabs() {
-    let tabButtons = document.querySelectorAll('.tab-container .tab');
+    const tabButtons = document.querySelectorAll('.tab-container .tab');
     tabButtons.forEach(tabButton => {
-        tabButton.addEventListener('click', (event)=>{
+        tabButton.addEventListener('click', (event) => {
             openTab(event, tabButton.dataset.tab);
-        })
-    })
+        });
+    });
     document.querySelectorAll('.tab-container .tab')[0].click();
 }
 
@@ -81,45 +87,96 @@ function addFeedbackLinkListener() {
 }
 
 function openTab(evt, tabName) {
-    var i, tabcontent, tablinks;
-    tabcontent = document.getElementsByClassName("tab-content");
-    for (i = 0; i < tabcontent.length; i++) {
+    const tabcontent = document.getElementsByClassName("tab-content");
+    for (let i = 0; i < tabcontent.length; i++) {
         tabcontent[i].style.display = "none";
         tabcontent[i].classList.remove("active");
     }
-    tablinks = document.getElementsByClassName("tab");
-    for (i = 0; i < tablinks.length; i++) {
+    const tablinks = document.getElementsByClassName("tab");
+    for (let i = 0; i < tablinks.length; i++) {
         tablinks[i].classList.remove("active");
+        tablinks[i].setAttribute('aria-selected', 'false');
     }
     document.getElementById(tabName).style.display = "block";
     document.getElementById(tabName).classList.add("active");
     evt.currentTarget.classList.add("active");
+    evt.currentTarget.setAttribute('aria-selected', 'true');
+
+    // Lazy-load feedback iframe on first visit
+    const tab = document.getElementById(tabName);
+    const iframe = tab.querySelector('iframe[data-src]');
+    if (iframe) {
+        iframe.src = iframe.dataset.src;
+        iframe.removeAttribute('data-src');
+    }
 }
 
-            // Listener for messages from background script
-            chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-                if (message.action === 'lastSearchResults') {
-                    console.log('Last 10 searches:', message.messageText);
-                    document.querySelector('#tab_2').innerHTML=`<div class="search-container">
-    <input type="text" class="search-in-history" placeholder="Search in history">
-</div>`;
+// Helper to safely create text elements
+function createTextElement(tag, className, text) {
+    const el = document.createElement(tag);
+    if (className) el.className = className;
+    el.textContent = text;
+    return el;
+}
 
-                    let searchInHistoryInput = document.querySelector("#tab_2 input.search-in-history");
-                    message.messageText.forEach(search => {
-                        const flagSrc = search.countryCode === 'uk' ? './img/united-kingdom-flag.png' : './img/united-states-flag.png';
-                        const dateObj = new Date(search.lastSearchDate);
-                        const date = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-                        document.querySelector('#tab_2').innerHTML +=`
-                        <div class="search-result">
-                            <div class="search-text">${search.searchText}</div>
-                            <div class="ipa-text">${search.ipaText}</div>
-                            <div class="dialect-info">
-                                <img src="${flagSrc}" alt="${search.countryCode.toUpperCase()}" class="dialect-flag">
-                                <span class="country-code">${search.countryCode.toUpperCase()}</span>
-                            </div>
-                            <div class="search-date">${date}</div>
-                        </div>
-                        `
-                    })
-                }
+// Listener for messages from background script — uses safe DOM methods instead of innerHTML
+chrome.runtime.onMessage.addListener((message) => {
+    if (message.action === 'lastSearchResults') {
+        const tab2 = document.querySelector('#tab_2');
+
+        // Clear existing content safely
+        tab2.textContent = '';
+
+        // Create search input container
+        const searchContainer = document.createElement('div');
+        searchContainer.className = 'search-container';
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.className = 'search-in-history';
+        searchInput.placeholder = 'Search in history';
+        searchContainer.appendChild(searchInput);
+        tab2.appendChild(searchContainer);
+
+        if (message.messageText.length === 0) {
+            // Empty state
+            const emptyState = document.createElement('div');
+            emptyState.className = 'empty-state';
+            const icon = createTextElement('div', 'empty-state-icon', '');
+            icon.textContent = '\uD83D\uDD0D';
+            const text = createTextElement('p', 'empty-state-text', 'No searches yet. Highlight a word on any page to get started.');
+            emptyState.appendChild(icon);
+            emptyState.appendChild(text);
+            tab2.appendChild(emptyState);
+        } else {
+            // Render each search result
+            message.messageText.forEach(search => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'search-result';
+
+                const searchTextDiv = createTextElement('div', 'search-text', search.searchText);
+                const ipaTextDiv = createTextElement('div', 'ipa-text', search.ipaText);
+
+                const dialectDiv = document.createElement('div');
+                dialectDiv.className = 'dialect-info';
+                const flagImg = document.createElement('img');
+                flagImg.src = search.countryCode === 'uk' ? './img/united-kingdom-flag.png' : './img/united-states-flag.png';
+                flagImg.alt = search.countryCode.toUpperCase();
+                flagImg.className = 'dialect-flag';
+                dialectDiv.appendChild(flagImg);
+                const countryLabel = createTextElement('span', 'dialect-label', search.countryCode.toUpperCase());
+                dialectDiv.appendChild(countryLabel);
+
+                const dateObj = new Date(search.lastSearchDate);
+                const date = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+                const dateDiv = createTextElement('div', 'search-date', date);
+
+                resultDiv.appendChild(searchTextDiv);
+                resultDiv.appendChild(ipaTextDiv);
+                resultDiv.appendChild(dialectDiv);
+                resultDiv.appendChild(dateDiv);
+
+                tab2.appendChild(resultDiv);
             });
+        }
+    }
+});
